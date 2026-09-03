@@ -1,0 +1,511 @@
+{
+  "schema_version": "1.0-draft",
+  "scene": {
+    "scene_id": "aurora_showroom",
+    "display_name": "曙光科技体验馆",
+    "venue_name": "曙光科技体验馆",
+    "robot_role": "展厅智能讲解员",
+    "default_content_language": "zh-CN",
+    "language_style": "清晰、专业、亲切",
+    "default_program_id": "full",
+    "runtime_policy": {
+      "authoring_mode": "dynamic",
+      "session_compiler_required": true,
+      "default_after_point_action": "direct",
+      "authoring_max_explain_points": 8,
+      "session_max_explain_points": 6,
+      "session_max_estimated_duration_seconds": 1800
+    }
+  },
+  "map_points": [
+    {
+      "map_point_key": "lobby",
+      "display_name": "迎宾大厅",
+      "navigation_point_id": "NAV-101",
+      "point_type": "business",
+      "is_accessible": true
+    },
+    {
+      "map_point_key": "innovation_wall",
+      "display_name": "创新历程墙",
+      "navigation_point_id": "NAV-102",
+      "point_type": "business",
+      "is_accessible": true
+    },
+    {
+      "map_point_key": "solution_zone",
+      "display_name": "解决方案展区",
+      "navigation_point_id": "NAV-103",
+      "point_type": "business",
+      "is_accessible": true
+    },
+    {
+      "map_point_key": "photo_zone",
+      "display_name": "合影区",
+      "navigation_point_id": "NAV-104",
+      "point_type": "business",
+      "is_accessible": true
+    },
+    {
+      "map_point_key": "transition_corner",
+      "display_name": "过渡转角",
+      "navigation_point_id": "NAV-W01",
+      "point_type": "waypoint",
+      "is_accessible": true
+    }
+  ],
+  "areas": [
+    {
+      "area_id": "main_showroom",
+      "display_name": "主展厅",
+      "description": "完全虚构的企业展厅动态契约示例。",
+      "narrator": "robot",
+      "explain_points": [
+        {
+          "explain_point_id": "welcome_point",
+          "display_name": "欢迎介绍",
+          "map_point_key": "lobby",
+          "narrator": "robot",
+          "tags": ["opening"],
+          "estimated_duration_seconds": 60,
+          "priority": 100,
+          "movement_narration": {
+            "approach": {
+              "default_route": {
+                "waypoint_map_point_keys": [],
+                "segments": [
+                  {
+                    "movement_segment_id": "approach_welcome",
+                    "content": {
+                      "text": "我们即将抵达迎宾大厅。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["approved_transition_copy"],
+                      "transformation": "generated_transition",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_start"}
+                  }
+                ]
+              }
+            },
+            "passing": {
+              "default_route": {
+                "waypoint_map_point_keys": [],
+                "segments": [
+                  {
+                    "movement_segment_id": "passing_welcome",
+                    "content": {
+                      "text": "右侧是本馆的迎宾大厅。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["approved_transition_copy"],
+                      "transformation": "generated_transition",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_progress", "progress_ratio": 0.5}
+                  }
+                ]
+              }
+            }
+          },
+          "segments": [
+            {
+              "segment_id": "welcome_opening",
+              "display_name": "欢迎词",
+              "content": {
+                "text": "欢迎来到曙光科技体验馆。",
+                "content_language": "zh-CN",
+                "source_reference_ids": ["showroom_brief_intro"],
+                "transformation": "constrained_rewrite",
+                "requires_confirmation": false
+              },
+              "variants": [
+                {
+                  "variant_id": "welcome_partner",
+                  "conditions": {"persona_ids": ["business_partner"]},
+                  "weight": 2,
+                  "content": {
+                    "text": "欢迎合作伙伴来到曙光科技体验馆。",
+                    "content_language": "zh-CN",
+                    "source_reference_ids": ["showroom_brief_intro"],
+                    "transformation": "constrained_rewrite",
+                    "requires_confirmation": false
+                  }
+                }
+              ],
+              "narrator": "robot",
+              "tags": ["opening"],
+              "estimated_duration_seconds": 35,
+              "is_mandatory": true,
+              "completion_policy": {"mode": "continue"}
+            }
+          ],
+          "after_point_policy": {"action": "direct"}
+        },
+        {
+          "explain_point_id": "innovation_history",
+          "display_name": "创新历程",
+          "map_point_key": "innovation_wall",
+          "narrator": "robot",
+          "tags": ["history"],
+          "estimated_duration_seconds": 150,
+          "priority": 80,
+          "movement_narration": {
+            "approach": {
+              "default_route": {
+                "waypoint_map_point_keys": ["transition_corner"],
+                "segments": [
+                  {
+                    "movement_segment_id": "approach_history",
+                    "content": {
+                      "text": "前方将介绍企业的虚构创新历程。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["approved_transition_copy"],
+                      "transformation": "generated_transition",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_waypoint", "waypoint_index": 0}
+                  }
+                ]
+              }
+            },
+            "passing": {
+              "default_route": {
+                "waypoint_map_point_keys": ["transition_corner"],
+                "segments": [
+                  {
+                    "movement_segment_id": "passing_history",
+                    "content": {
+                      "text": "经过创新历程墙时，可以看到三个虚构发展阶段。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["showroom_brief_history"],
+                      "transformation": "constrained_rewrite",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_progress", "progress_ratio": 0.6}
+                  }
+                ]
+              }
+            }
+          },
+          "segments": [
+            {
+              "segment_id": "history_summary",
+              "display_name": "历程摘要",
+              "content": {
+                "text": "展墙展示了研发起步、产品拓展和生态合作三个虚构阶段。",
+                "content_language": "zh-CN",
+                "source_reference_ids": ["showroom_brief_history"],
+                "transformation": "constrained_rewrite",
+                "requires_confirmation": false
+              },
+              "narrator": "robot",
+              "tags": ["history"],
+              "estimated_duration_seconds": 90,
+              "is_mandatory": true,
+              "completion_policy": {"mode": "continue"}
+            }
+          ],
+          "after_point_policy": {"action": "ask_questions"}
+        },
+        {
+          "explain_point_id": "solution_overview",
+          "display_name": "方案概览",
+          "map_point_key": "solution_zone",
+          "narrator": "robot",
+          "tags": ["solution"],
+          "estimated_duration_seconds": 180,
+          "priority": 70,
+          "conditions": {"duration_mode_ids": ["full"]},
+          "movement_narration": {
+            "approach": {
+              "default_route": {
+                "waypoint_map_point_keys": [],
+                "segments": [
+                  {
+                    "movement_segment_id": "approach_solution",
+                    "content": {
+                      "text": "接下来进入解决方案展区。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["approved_transition_copy"],
+                      "transformation": "generated_transition",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_start"}
+                  }
+                ]
+              }
+            },
+            "passing": {
+              "allow_silent_pass": true
+            }
+          },
+          "segments": [
+            {
+              "segment_id": "solution_summary",
+              "display_name": "方案摘要",
+              "content": {
+                "text": "该虚构展区展示感知、协同和服务三个方案模块。",
+                "content_language": "zh-CN",
+                "source_reference_ids": ["showroom_brief_solution"],
+                "transformation": "constrained_rewrite",
+                "requires_confirmation": false
+              },
+              "narrator": "robot",
+              "tags": ["solution"],
+              "estimated_duration_seconds": 110,
+              "is_mandatory": true,
+              "completion_policy": {"mode": "continue"}
+            }
+          ],
+          "after_point_policy": {"action": "dwell_continue", "dwell_seconds": 10}
+        },
+        {
+          "explain_point_id": "route_photo_checkpoint",
+          "display_name": "路线内合影点",
+          "map_point_key": "photo_zone",
+          "narrator": "robot",
+          "tags": ["photo"],
+          "estimated_duration_seconds": 120,
+          "priority": 40,
+          "conditions": {"photo_enabled": true},
+          "movement_narration": {
+            "approach": {
+              "default_route": {
+                "waypoint_map_point_keys": [],
+                "segments": [
+                  {
+                    "movement_segment_id": "approach_photo",
+                    "content": {
+                      "text": "前方是可选合影区域。",
+                      "content_language": "zh-CN",
+                      "source_reference_ids": ["approved_transition_copy"],
+                      "transformation": "generated_transition",
+                      "requires_confirmation": false
+                    },
+                    "trigger": {"trigger_type": "on_start"}
+                  }
+                ]
+              }
+            },
+            "passing": {"allow_silent_pass": true}
+          },
+          "segments": [
+            {
+              "segment_id": "photo_prompt",
+              "display_name": "合影提示",
+              "content": {
+                "text": "如需合影，请在标识区域内站定。",
+                "content_language": "zh-CN",
+                "source_reference_ids": ["approved_photo_copy"],
+                "transformation": "generated_transition",
+                "requires_confirmation": false
+              },
+              "narrator": "robot",
+              "tags": ["photo"],
+              "estimated_duration_seconds": 40,
+              "is_mandatory": true,
+              "completion_policy": {"mode": "wait_for_continue", "is_silent_wait": false}
+            }
+          ],
+          "after_point_policy": {"action": "direct"}
+        }
+      ]
+    }
+  ],
+  "programs": [
+    {
+      "program_id": "full",
+      "display_name": "完整参观",
+      "duration_mode_id": "full",
+      "explain_point_ids": ["welcome_point", "innovation_history", "solution_overview", "route_photo_checkpoint"],
+      "default_pacing_mode": "station",
+      "photo_policy": {
+        "photo_subgraph_timing": "after_program",
+        "photo_map_point_key": "photo_zone",
+        "allow_session_override": true
+      },
+      "limits": {"max_explain_points": 6, "max_estimated_duration_seconds": 1800}
+    },
+    {
+      "program_id": "express",
+      "display_name": "快速参观",
+      "duration_mode_id": "express",
+      "explain_point_ids": ["welcome_point", "innovation_history", "route_photo_checkpoint"],
+      "default_pacing_mode": "flowing",
+      "photo_policy": {
+        "photo_subgraph_timing": "disabled",
+        "allow_session_override": true
+      },
+      "limits": {"max_explain_points": 4, "max_estimated_duration_seconds": 720}
+    }
+  ],
+  "personas": [
+    {
+      "persona_id": "general_visitor",
+      "display_name": "普通访客",
+      "audience_title": "访客",
+      "condition_aliases": ["visitor"],
+      "profile_recommendations": {
+        "perspective_id": "overview",
+        "duration_mode_id": "full",
+        "pacing_mode": "station",
+        "joke_level": 1,
+        "recommended_interaction_enabled": true,
+        "recommended_photo_enabled": true
+      },
+      "pad_exposure": {"is_visible": true, "is_editable": true}
+    },
+    {
+      "persona_id": "business_partner",
+      "display_name": "合作伙伴",
+      "audience_title": "合作伙伴",
+      "condition_aliases": ["partner"],
+      "profile_recommendations": {
+        "perspective_id": "cooperation",
+        "duration_mode_id": "full",
+        "pacing_mode": "station",
+        "joke_level": 0,
+        "recommended_interaction_enabled": true,
+        "recommended_photo_enabled": true
+      },
+      "pad_exposure": {"is_visible": true, "is_editable": true}
+    },
+    {
+      "persona_id": "time_limited_guest",
+      "display_name": "时间有限访客",
+      "audience_title": "访客",
+      "condition_aliases": ["express_guest"],
+      "profile_recommendations": {
+        "perspective_id": "overview",
+        "duration_mode_id": "express",
+        "pacing_mode": "flowing",
+        "joke_level": 0,
+        "recommended_interaction_enabled": false,
+        "recommended_photo_enabled": false
+      },
+      "pad_exposure": {"is_visible": true, "is_editable": true}
+    }
+  ],
+  "dynamic_authoring": {
+    "profile_dimensions": [
+      {
+        "profile_dimension_id": "persona_id",
+        "value_type": "string",
+        "allowed_values": ["general_visitor", "business_partner", "time_limited_guest"],
+        "scene_default": "general_visitor",
+        "is_required": true,
+        "allow_session_override": true,
+        "pad_exposure": {"is_visible": true, "is_editable": true},
+        "pii_classification": "none"
+      },
+      {
+        "profile_dimension_id": "program_id",
+        "value_type": "string",
+        "allowed_values": ["full", "express"],
+        "scene_default": "full",
+        "is_required": true,
+        "allow_session_override": true,
+        "pad_exposure": {"is_visible": true, "is_editable": true},
+        "pii_classification": "none"
+      },
+      {
+        "profile_dimension_id": "pacing_mode",
+        "value_type": "string",
+        "allowed_values": ["station", "flowing"],
+        "scene_default": "station",
+        "is_required": true,
+        "allow_session_override": true,
+        "pad_exposure": {"is_visible": true, "is_editable": true},
+        "pii_classification": "none"
+      },
+      {
+        "profile_dimension_id": "photo_enabled",
+        "value_type": "boolean",
+        "scene_default": false,
+        "is_required": true,
+        "allow_session_override": true,
+        "pad_exposure": {"is_visible": true, "is_editable": true},
+        "pii_classification": "none"
+      },
+      {
+        "profile_dimension_id": "interaction_enabled",
+        "value_type": "boolean",
+        "scene_default": true,
+        "is_required": true,
+        "allow_session_override": true,
+        "pad_exposure": {"is_visible": true, "is_editable": true},
+        "pii_classification": "none"
+      }
+    ],
+    "template_slots": [],
+    "language_capabilities": {
+      "content_languages": ["zh-CN"],
+      "pad_selectable_languages": ["zh-CN"],
+      "required_nlu_languages": ["zh-CN"],
+      "required_tts_languages": ["zh-CN"],
+      "runtime_switchable_languages": ["zh-CN"]
+    },
+    "capability_requirements": {
+      "dynamic_session_compilation": true,
+      "conditions": true,
+      "variants": true,
+      "station_approach": true,
+      "flowing_passing": true,
+      "calendar_hooks": false,
+      "ask_questions": true,
+      "dwell_continue": true,
+      "wait_for_continue": true,
+      "route_photo_checkpoint": true,
+      "program_photo_subgraph": true,
+      "interrupt_resume": true
+    }
+  },
+  "source_references": [
+    {
+      "source_reference_id": "showroom_brief_intro",
+      "source_file": "Inputs/showroom-brief.md",
+      "locator": "section:introduction",
+      "fact_classification": "source_fact"
+    },
+    {
+      "source_reference_id": "showroom_brief_history",
+      "source_file": "Inputs/showroom-brief.md",
+      "locator": "section:fictional-history",
+      "fact_classification": "source_fact"
+    },
+    {
+      "source_reference_id": "showroom_brief_solution",
+      "source_file": "Inputs/showroom-brief.md",
+      "locator": "section:fictional-solutions",
+      "fact_classification": "source_fact"
+    },
+    {
+      "source_reference_id": "approved_transition_copy",
+      "source_file": "Inputs/approved-copy.md",
+      "locator": "section:transitions",
+      "fact_classification": "approved_template"
+    },
+    {
+      "source_reference_id": "approved_photo_copy",
+      "source_file": "Inputs/approved-copy.md",
+      "locator": "section:photo",
+      "fact_classification": "approved_template"
+    }
+  ],
+  "requirement_resolution": [
+    {
+      "requirement_id": "default_program_requirement",
+      "field_path": "$.scene.default_program_id",
+      "resolved_value": "full",
+      "resolution_source": "user_explicit",
+      "confirmation_status": "confirmed",
+      "source_reference_ids": []
+    }
+  ],
+  "generation_metadata": {
+    "generator_id": "rein_scene_forge_fixture",
+    "generator_version": "0.1.0-dev",
+    "rules_version": "dynamic-contract-1.0-draft",
+    "generation_seed": "fixture-seed-001"
+  }
+}
