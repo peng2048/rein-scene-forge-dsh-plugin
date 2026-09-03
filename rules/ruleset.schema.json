@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rules_version", "target_runtime", "publication_policy", "rules"],
+  "properties": {
+    "rules_version": { "type": "string", "minLength": 1 },
+    "target_runtime": { "const": "tour_robot" },
+    "publication_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_result", "allow_errors", "allow_warnings"],
+      "properties": {
+        "required_result": { "const": "is_publishable" },
+        "allow_errors": { "const": false },
+        "allow_warnings": { "const": false }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "category", "severity", "enforcement", "applies_to", "requirement", "fix"],
+        "properties": {
+          "rule_id": { "type": "string", "pattern": "^RSF_RULE_[A-Z0-9_]+$" },
+          "category": { "enum": ["input", "model", "identity", "reference", "program", "content", "publication"] },
+          "severity": { "enum": ["error", "warning"] },
+          "enforcement": { "enum": ["schema", "validator", "agent_review", "policy"] },
+          "applies_to": { "type": "string", "minLength": 1 },
+          "requirement": { "type": "string", "minLength": 1 },
+          "fix": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -9,26 +9,27 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 
 ## Required Workflow
 
-1. Locate and read `points.json` and all narration material. Do not modify either source.
-2. Ask the user for a scene name. Derive a stable lowercase snake_case `scene_id` and confirm it.
-3. Invoke `analyze_point_input` on `points.json`.
-4. Inventory every source point. Never renumber, merge, or silently omit a point.
-5. Treat `id` as the physical navigation ID. Treat the YAML map key and Explain Point key as separate logical identities.
-6. Review exact and near-pose groups with the user. Equal `x`, `y`, and `yaw` does not mean duplicate. For example, welcome and farewell may share one pose but remain different logical points.
-7. Match narration sections to point candidates by meaning and route context. If names and narration do not reliably match, stop and ask the user; do not guess.
-8. Confirm at least: scene identity, point-to-content mapping, route order, welcome/standby/farewell/photo roles, inaccessible or unused points, narration preservation/optimization policy, and optional reception behavior.
-9. Read `references/model-catalog.md` before selecting any field, then read `references/tour-robot-data-model.md` and fill the bundled templates. The catalog is authoritative: never invent a target field.
-10. Create exactly one output directory named by the confirmed `scene_id`.
-11. Write only:
+1. Invoke `get_authoring_rules` without filters and follow the returned versioned Rule Set for the entire task.
+2. Locate and read `points.json` and all narration material. Do not modify either source.
+3. Ask the user for a scene name. Derive a stable lowercase snake_case `scene_id` and confirm it.
+4. Invoke `analyze_point_input` on `points.json`.
+5. Inventory every source point. Never renumber, merge, or silently omit a point.
+6. Treat `id` as the physical navigation ID. Treat the YAML map key and Explain Point key as separate logical identities.
+7. Review exact and near-pose groups with the user. Equal `x`, `y`, and `yaw` does not mean duplicate. For example, welcome and farewell may share one pose but remain different logical points.
+8. Match narration sections to point candidates by meaning and route context. If names and narration do not reliably match, stop and ask the user; do not guess.
+9. Confirm at least: scene identity, point-to-content mapping, route order, welcome/standby/farewell/photo roles, inaccessible or unused points, narration preservation/optimization policy, and optional reception behavior.
+10. Read `references/model-catalog.md` before selecting any field, then read `references/tour-robot-data-model.md` and fill the bundled templates. The catalog is authoritative: never invent a target field.
+11. Create exactly one output directory named by the confirmed `scene_id`.
+12. Write only:
     - `map_config.yaml`
     - `scene_config.yaml`
     - `explain_config.yaml`
     - `reception_pack.yaml` only when dynamic reception/personas are explicitly requested and confirmed
-12. Build the internal authoring envelope and invoke `validate_authoring_model`; fix all model errors before writing YAML.
-13. Read and execute every gate in `references/validation-sop.md` after generation.
-14. Invoke `validate_tour_robot_scene` with the scene directory and original `points.json` until it returns `is_publishable: true`.
-15. Resolve every unreachable Explain Point and loader compatibility warning. Ask before changing point roles, Program execution order, photo behavior, content, or other semantics.
-16. Report the output directory, validation counts, Program routes, content coverage, and remaining uncertainties. Do not call a scene import-ready when `is_publishable` is false.
+13. Build the internal authoring envelope and invoke `validate_authoring_model`; fix all model errors before writing YAML.
+14. Read and execute every gate in `references/validation-sop.md` after generation.
+15. Invoke `validate_tour_robot_scene` with the scene directory and original `points.json` until it returns `is_publishable: true`.
+16. Resolve every unreachable Explain Point and loader compatibility warning. Ask before changing point roles, Program execution order, photo behavior, content, or other semantics.
+17. Report the Rule Set version, output directory, validation counts, Program routes, content coverage, and remaining uncertainties. Do not call a scene import-ready when `is_publishable` is false.
 
 ## Content Rules
 
@@ -51,6 +52,7 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 
 ## Tools
 
+- `get_authoring_rules`: loads the versioned rules and publication policy; invoke it before generation.
 - `analyze_point_input`: validates raw points and reports exact/near physical poses without merging logical points.
 - `validate_authoring_model`: validates the complete internal envelope and the exact four target YAML models.
 - `validate_tour_robot_scene`: validates the final YAML directory against `points.json` and real `tour_robot` runtime rules.

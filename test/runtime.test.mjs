@@ -4,12 +4,22 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
 import { parse, stringify } from "yaml";
-import { analyzePointInput, validateAuthoringModel, validateTourRobotScene } from "../lib/runtime.js";
+import { analyzePointInput, getAuthoringRules, validateAuthoringModel, validateTourRobotScene } from "../lib/runtime.js";
 
 const points = [
   { id: 3, name: "welcome", x: -0.49, y: -28.3, yaw: 180 },
   { id: 4, name: "farewell", x: -0.49, y: -28.3, yaw: 180 }
 ];
+
+test("loads a unique versioned authoring rule set", async () => {
+  const ruleset = await getAuthoringRules();
+  assert.equal(ruleset.rules_version, "1.0");
+  assert.equal(ruleset.publication_policy.allow_warnings, false);
+  assert.equal(new Set(ruleset.rules.map((rule) => rule.rule_id)).size, ruleset.rules.length);
+  const programRules = await getAuthoringRules({ category: "program" });
+  assert.ok(programRules.rules.length > 0);
+  assert.ok(programRules.rules.every((rule) => rule.category === "program"));
+});
 
 async function workspace(run) {
   const previous = process.cwd();

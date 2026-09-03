@@ -43,6 +43,7 @@ AI 可读取：
 
 ## 工具
 
+- `get_authoring_rules`：加载版本化规则集、规则严重级别和发布策略。
 - `analyze_point_input`：检查原始点位，识别完全共址和近似共址点，不合并不同逻辑点。
 - `validate_authoring_model`：在写 YAML 前校验完整内部作者模型和四份目标配置对象。
 - `validate_tour_robot_scene`：校验最终 YAML、跨文件引用、物理导航 ID、源点覆盖和程序限制。
