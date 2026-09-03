@@ -28,6 +28,7 @@ AI 可读取：
 
 - `skills/robot-scene-authoring/references/model-catalog.md`（字段选择的权威清单）
 - `skills/robot-scene-authoring/references/tour-robot-data-model.md`
+- `skills/robot-scene-authoring/references/validation-sop.md`（生成后强制验收流程）
 - `skills/robot-scene-authoring/templates/*.template.yaml`
 
 确定性工具使用：
@@ -45,6 +46,8 @@ AI 可读取：
 - `analyze_point_input`：检查原始点位，识别完全共址和近似共址点，不合并不同逻辑点。
 - `validate_authoring_model`：在写 YAML 前校验完整内部作者模型和四份目标配置对象。
 - `validate_tour_robot_scene`：校验最终 YAML、跨文件引用、物理导航 ID、源点覆盖和程序限制。
+
+只有最终校验返回 `is_publishable: true` 才能标记为可导入；仅有 `is_valid: true` 但仍有 warning 时不能交付。
 
 ## 开发验证
 

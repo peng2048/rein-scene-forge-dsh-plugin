@@ -53,6 +53,7 @@ test("validates a minimal scene against bundled model", async () => {
     await writeScene();
     const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
     assert.equal(result.is_valid, true, JSON.stringify(result.diagnostics));
+    assert.equal(result.is_publishable, false);
     assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_PHOTO_POINT_MISSING"));
   });
 });
@@ -67,6 +68,7 @@ test("reports loader warnings and unreachable explain points", async () => {
     await writeFile("demo/scene_config.yaml", stringify(scene));
     const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
     assert.equal(result.is_valid, true);
+    assert.equal(result.is_publishable, false);
     assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_PHOTO_MODE_CONFLICT"));
     assert.ok(result.diagnostics.some((item) => item.code === "RSF_EXPLAIN_POINTS_UNREACHABLE" && item.message.includes("farewell_end")));
   });

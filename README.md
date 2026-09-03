@@ -3,6 +3,7 @@
 Generates and validates `tour_robot` YAML from an authoritative `points.json` and narration material.
 
 The bundled Skill uses `references/model-catalog.md` as its field-selection authority. The internal authoring envelope embeds the exact target objects defined by `schemas/tour-robot/*.schema.json`; unknown target YAML fields are rejected.
+Every generated scene must complete `references/validation-sop.md`. Only `is_publishable: true` is import-ready; `is_valid: true` with warnings is not.
 
 The plugin exposes three deterministic tools:
 
