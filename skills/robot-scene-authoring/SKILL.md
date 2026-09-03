@@ -26,7 +26,7 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
     - `reception_pack.yaml` only when dynamic reception/personas are explicitly requested and confirmed
 12. Build the internal authoring envelope and invoke `validate_authoring_model`; fix all model errors before writing YAML.
 13. Invoke `validate_tour_robot_scene` with the scene directory and original `points.json`.
-14. Fix structural errors automatically only when semantics do not change. Ask before changing point roles, mappings, route order, content, or behavior.
+14. Resolve every unreachable Explain Point and loader compatibility warning. Ask before changing point roles, Program execution order, photo behavior, content, or other semantics.
 15. Report the output directory and remaining uncertainties. Do not call a scene usable when validation fails.
 
 ## Content Rules

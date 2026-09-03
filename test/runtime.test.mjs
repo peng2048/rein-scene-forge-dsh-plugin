@@ -53,6 +53,35 @@ test("validates a minimal scene against bundled model", async () => {
     await writeScene();
     const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
     assert.equal(result.is_valid, true, JSON.stringify(result.diagnostics));
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_PHOTO_POINT_MISSING"));
+  });
+});
+
+test("reports loader warnings and unreachable explain points", async () => {
+  await workspace(async () => {
+    await writeScene();
+    const scene = parse(await readFile("demo/scene_config.yaml", "utf8"));
+    scene.programs.full.explain_point_keys = ["welcome_start"];
+    scene.programs.full.photo_before_explain = true;
+    scene.programs.full.photo_after_explain = true;
+    await writeFile("demo/scene_config.yaml", stringify(scene));
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    assert.equal(result.is_valid, true);
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_PHOTO_MODE_CONFLICT"));
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_EXPLAIN_POINTS_UNREACHABLE" && item.message.includes("farewell_end")));
+  });
+});
+
+test("rejects a scene directory that does not match scene_id", async () => {
+  await workspace(async () => {
+    await writeScene();
+    await mkdir("wrong-name");
+    for (const file of ["map_config.yaml", "scene_config.yaml", "explain_config.yaml"]) {
+      await writeFile(`wrong-name/${file}`, await readFile(`demo/${file}`));
+    }
+    const result = await validateTourRobotScene({ scene_directory: "wrong-name", points_path: "points.json" });
+    assert.equal(result.is_valid, false);
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_SCENE_DIRECTORY_MISMATCH"));
   });
 });
 
