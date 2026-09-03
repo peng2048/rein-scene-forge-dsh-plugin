@@ -1,67 +1,45 @@
 ---
 name: robot-scene-authoring
-description: Author traceable robot tour or reception scenes from source material, point input, and business requirements. Use when an AI Agent must inventory inputs, interview the user, choose preserve/optimize/mixed content handling, generate Scene IR, and produce a verified tour_robot scene package through plugin-registered tools.
+description: Generate tour_robot YAML from points.json and narration material, preserving physical and logical point identities and validating the final scene directory.
 ---
 
 # Robot Scene Authoring
 
-Act as an Agent-first scene author. Understand and confirm the job before generating anything. AI performs source understanding and semantic planning; plugin-registered deterministic tools validate, compile, and verify.
+Use the installed plugin to turn an authoritative `points.json` and narration document into a minimal `tour_robot` scene directory. The AI understands and structures content; deterministic tools analyze point geometry and validate the final YAML.
 
-## Mandatory Order
+## Required Workflow
 
-1. **Inventory inputs.** Locate or request source material, point input, scene requirement, target runtime, and output expectations. Record what is present, missing, unreadable, conflicting, or unverified.
-2. **Restate understanding.** Summarize the scene, audience, route, duration, required and forbidden topics, interaction/photo policy, target runtime, and known constraints. Separate verified facts from assumptions and open questions.
-3. **Ask sufficient questions.** Resolve every high-impact uncertainty before generating publishable Scene IR. Group concise questions by blocking priority; do not treat silence as approval.
-4. **Confirm content mode.** Obtain `preserve`, `optimize`, or `mixed`. For `mixed`, confirm the mode for each affected source, point, or segment; unspecified items remain blocked.
-5. **Validate requirements.** Invoke the plugin-registered `validate_scene_requirement` tool. Resolve its errors and high-impact warnings with the user before proceeding.
-6. **Generate Scene IR.** Build a traceable candidate from confirmed inputs only. Do not write target YAML directly.
-7. **Validate Scene IR.** Invoke `validate_scene_ir`. Automatically repair only low-risk structural diagnostics, revalidate after every repair, and ask before any high-impact change.
-8. **Compile.** Invoke `compile_tour_robot_scene` only for Scene IR that passes validation and has no unresolved high-impact decision.
-9. **Verify the package.** Invoke `verify_scene_package`. A package is publishable only when verification succeeds under the applicable warning policy.
-10. **Report.** List inputs, confirmed decisions, content modes, source coverage, automatic repairs, diagnostics, output artifacts, verification status, and remaining risks.
+1. Locate and read `points.json` and all narration material. Do not modify either source.
+2. Ask the user for a scene name. Derive a stable lowercase snake_case `scene_id` and confirm it.
+3. Invoke `analyze_point_input` on `points.json`.
+4. Inventory every source point. Never renumber, merge, or silently omit a point.
+5. Treat `id` as the physical navigation ID. Treat the YAML map key and Explain Point key as separate logical identities.
+6. Review exact and near-pose groups with the user. Equal `x`, `y`, and `yaw` does not mean duplicate. For example, welcome and farewell may share one pose but remain different logical points.
+7. Match narration sections to point candidates by meaning and route context. If names and narration do not reliably match, stop and ask the user; do not guess.
+8. Confirm at least: scene identity, point-to-content mapping, route order, welcome/standby/farewell/photo roles, inaccessible or unused points, narration preservation/optimization policy, and optional reception behavior.
+9. Read `references/tour-robot-data-model.md`, then fill the bundled templates under `templates/`. The templates are the default skeleton; uncomment/select optional fields only when the inputs and user confirmation require them.
+10. Create exactly one output directory named by the confirmed `scene_id`.
+11. Write only:
+    - `map_config.yaml`
+    - `scene_config.yaml`
+    - `explain_config.yaml`
+    - `reception_pack.yaml` only when dynamic reception/personas are explicitly requested and confirmed
+12. Invoke `validate_tour_robot_scene` with the scene directory and original `points.json`.
+13. Fix structural errors automatically only when semantics do not change. Ask before changing point roles, mappings, route order, content, or behavior.
+14. Report the output directory and remaining uncertainties. Do not call a scene usable when validation fails.
 
-Do not skip inventory, restatement, or questions merely because input files already exist or appear complete. Read `references/workflow.md` for the decision boundaries and detailed procedure.
+## Content Rules
 
-## Content Modes
+- Preserve all facts, numbers, proper nouns, qualifications, and conclusions unless the user explicitly approves an omission or rewrite.
+- Split large narration sections into reviewable segments; do not flatten many exhibits into one monologue.
+- Do not invent spatial language such as “left side” or “ahead” from coordinates alone.
+- Do not invent gestures, robot model, audience, duration, Q&A, photo, personas, joke level, accessibility, or runtime capabilities.
+- A source section with no reliable point match is a blocking mismatch and must be reported.
+- A source point with no confirmed purpose remains in `map_config.yaml`; report it and ask whether it is a waypoint, service destination, explain stop, or unused point.
 
-- **`preserve` — original-text preservation:** Preserve facts, numbers, proper nouns, conclusions, stance, and wording. Only split by point or duration, merge fragments, adjust punctuation, and add minimal fact-free transitions. Make every omission visible. Do not polish, expand, summarize away qualifications, or silently reorder meaning.
-- **`optimize` — constrained optimization:** Improve spoken clarity, structure, pacing, audience fit, and tone without changing or adding facts, numbers, proper nouns, conclusions, or stance. Retain source references and record the transformation.
-- **`mixed` — explicit per-item selection:** Apply `preserve` or `optimize` at the confirmed source, point, or segment scope. Ask about every uncovered item; never choose a global fallback.
+## Tools
 
-No mode permits invented awards, specifications, history, customers, partnerships, contact details, navigation identifiers, gestures, robot capabilities, or target-runtime fields.
+- `analyze_point_input`: validates raw points and reports exact/near physical poses without merging logical points.
+- `validate_tour_robot_scene`: validates the final YAML directory against `points.json` and real `tour_robot` runtime rules.
 
-## Decision Boundary
-
-Automatically fix a diagnostic only when the repair is deterministic, reversible, fact-neutral, and does not change route intent, point identity, content meaning, or business policy. Examples include canonical formatting, deterministic ordering, duplicate removal where identity and retained value are identical, and a uniquely resolvable internal reference.
-
-Ask the user before changing or supplying any:
-
-- source fact, number, proper noun, claim, conclusion, or conflict resolution;
-- `map_point_key`, navigation point ID, point-to-content match, accessibility, or route order;
-- audience, duration, language, tone, mandatory/forbidden topic, interaction, dwell, Q&A, photo, handoff, or publication policy;
-- robot gesture, capability, target compatibility assumption, or unsupported-feature downgrade;
-- ambiguous reference, deletion with semantic impact, or choice among multiple valid repairs.
-
-Never suppress a diagnostic, convert an error to a warning, or claim that an unconfirmed decision is validated.
-
-## Tool Boundary and Degraded Mode
-
-Invoke tools by their plugin-registered names only:
-
-- `validate_scene_requirement`
-- `validate_scene_ir`
-- `compile_tour_robot_scene`
-- `verify_scene_package`
-
-Do not assume a source-repository checkout, repository-relative executable, shell command, global Python installation, or global CLI. Do not reproduce compiler or Schema logic in the prompt.
-
-If any required tool is unavailable, fails to return a trustworthy result, or cannot complete the applicable stage:
-
-- stop the publishable workflow;
-- do not hand-write or improvise target YAML or a scene package;
-- output only an explicitly labeled **unverified, not-publishable draft** and the information collected so far;
-- state which tool and stage were unavailable and what must be rerun after tool restoration.
-
-## Output Standard
-
-A successful report must state that all four applicable tool stages completed, identify any allowed warnings, and distinguish a verified scene package from drafts or intermediate Scene IR. Never describe a draft, unchecked file set, or model-generated configuration as publishable.
+The source repository, Scene IR, requirement JSON, manifest, traceability report, summary, and import guide are not user inputs or default outputs.

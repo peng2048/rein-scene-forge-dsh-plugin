@@ -1,0 +1,12 @@
+version: "1.0"
+scene_id: "<confirmed_scene_id>"
+points:
+  <confirmed_map_point_key>:
+    name: "<source_or_confirmed_display_name>"
+    point_id: "<points_json_id>"
+    # Optional only when supplied for the deployment debug map:
+    # dbg_point_id: "<confirmed_debug_point_id>"
+    # Optional metadata; do not infer:
+    # type: "base | business | waypoint"
+    # description: "<confirmed_description>"
+    # accessible: true

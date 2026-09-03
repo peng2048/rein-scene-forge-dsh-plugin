@@ -1,0 +1,29 @@
+version: "1.0"
+scene_id: "<confirmed_scene_id>"
+scene_name: "<confirmed_scene_name>"
+prompt_context:
+  venue_name: "<confirmed_venue_name>"
+role: "<confirmed_robot_role>"
+language_style: "<confirmed_language_style>"
+default_language: "zh"
+
+basic_templates:
+  welcome_prefix: "<confirmed_or_source_based_welcome>"
+  farewell_suffix: "<confirmed_or_source_based_farewell>"
+  busy_prompt: "抱歉，我正在执行讲解任务，请稍候再呼叫我。"
+  pause_resume: "讲解已暂停，您可以随时对我说“继续”恢复讲解。"
+  position_guide: "请跟我前往{target_point_name}。"
+  unknown_intent: "抱歉，我暂时没有理解您的需求。"
+
+programs:
+  full:
+    name: "完整导览"
+    explain_point_keys:
+      - "<confirmed_explain_point_key>"
+
+# Optional blocks selected only from confirmed requirements:
+# obstacle_speech: ...
+# standby_vision_responses: ...
+# special_configs: ...
+# dynamic_tour: ...
+# Additional programs such as express: ...

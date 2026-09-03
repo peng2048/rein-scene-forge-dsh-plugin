@@ -1,0 +1,21 @@
+# Optional: generate only for explicitly confirmed dynamic reception.
+scene_id: "<confirmed_scene_id>"
+scene_name: "<confirmed_scene_name>"
+languages:
+  - "zh"
+personas:
+  - id: "<confirmed_persona_id>"
+    label: "<confirmed_persona_label>"
+    audience_title: "<confirmed_audience_title>"
+    defaults:
+      priority: "medium"
+      joke_level: 0
+      photo_enabled: false
+      interaction_enabled: false
+      duration_mode: "full"
+      pacing: "station"
+      perspective: "balanced"
+# Optional supported mappings:
+# region_greetings: {...}
+# condition_aliases: {...}
+# legacy_group_types: {...}

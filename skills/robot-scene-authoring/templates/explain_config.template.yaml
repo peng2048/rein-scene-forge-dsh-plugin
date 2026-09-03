@@ -1,0 +1,32 @@
+version: "2.0"
+scene_id: "<confirmed_scene_id>"
+max_explain_points: <confirmed_or_actual_route_limit>
+max_segments_per_point: 16
+areas:
+  <area_key>:
+    id: "<area_key>"
+    name: "<source_or_confirmed_area_name>"
+    description: "<source_or_confirmed_area_description>"
+    narrator: "robot"
+    points:
+      <explain_point_key>:
+        id: "<explain_point_key>"
+        name: "<source_or_confirmed_point_name>"
+        map_point: "<confirmed_map_point_key>"
+        point_id: "<points_json_id>"
+        narrator: "robot"
+        estimated_duration: <estimated_seconds>
+        priority: <route_order_integer>
+        after_point_explain: "direct"
+        segments:
+          <segment_key>:
+            id: "<segment_key>"
+            name: "<source_section_or_paragraph_name>"
+            content: "<content_derived_from_narration>"
+            estimated_duration: <estimated_seconds>
+            is_mandatory: true
+        # Optional supported capabilities, only when required:
+        # tags: ["..."]
+        # keywords: "..."
+        # approach: { default: { waypoints: [], segments: {...} } }
+        # passing: { default: { segments: {...} } }

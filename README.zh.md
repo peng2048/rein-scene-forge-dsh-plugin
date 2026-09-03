@@ -1,35 +1,52 @@
 # Rein Scene Forge DeepSeek Harness 插件
 
-这是一个预构建 ESM DeepSeek Harness 插件，提供 `robot-scene-authoring` Skill 和四个本地确定性工具。
+插件帮助 AI 根据用户提供的 `points.json` 和讲解词生成符合 `tour_robot` 数据模型的 YAML。
+
+## 默认输入与输出
+
+输入：
+
+- `points.json`
+- 讲解词 Markdown 或文本
+- 用户确认的场景名称和歧义项
+
+输出目录：
+
+```text
+<scene_id>/
+├── map_config.yaml
+├── scene_config.yaml
+├── explain_config.yaml
+└── reception_pack.yaml  # 仅启用动态接待时
+```
+
+插件不默认生成 Scene IR、Requirement JSON、manifest、traceability、summary 或 import guide。
+
+## 内置数据模型
+
+AI 可读取：
+
+- `skills/robot-scene-authoring/references/tour-robot-data-model.md`
+- `skills/robot-scene-authoring/templates/*.template.yaml`
+
+确定性工具使用：
+
+- `schemas/tour-robot/map-config.schema.json`
+- `schemas/tour-robot/scene-config.schema.json`
+- `schemas/tour-robot/explain-config.schema.json`
+- `schemas/tour-robot/reception-pack.schema.json`
+
+模板提供默认骨架；Schema 同时描述运行时支持的可选字段。可选能力只有在用户输入或确认要求时才使用。
 
 ## 工具
 
-所有路径均以当前 Workspace 为边界解析，不能逃逸到 Workspace 外。默认不覆盖已有报告或生成文件，只有显式传入 `force: true` 才允许覆盖。
-
-- `validate_scene_requirement`：校验 Scene Requirement JSON，并写出 JSON 报告。
-- `validate_scene_ir`：使用随包 JSON Schema 和跨引用规则校验 Scene IR。
-- `compile_tour_robot_scene`：把已校验 Scene IR 编译为 `tour_robot` 动态作者场景包。
-- `verify_scene_package`：复验 `manifest.json`，并校验 manifest 所列目标文件的 SHA-256 哈希。
-
-场景包包含 `map_config.yaml`、`scene_config.yaml`、`explain_config.yaml`、`reception_pack.yaml`、`pad-profile-schema.json`、`manifest.json`、`scene-ir.json`、`validation-report.json`、`summary.json`、`traceability.json` 和 `import-guide.md`。
-
-## Runtime
-
-npm 包可独立运行，需要 Node.js 20 或更高版本，仅依赖 `ajv`、`yaml` 和 Node 标准库；运行时不依赖 Rein Scene Forge 源码仓库或 Python 环境。
-
-当前最小 Adapter 会保留动态作者配置中的 Conditions 和 Variants，并在 manifest 中声明 Session Compiler 由目标 Runtime 提供；插件不包含完整动态 Session Compiler。
+- `analyze_point_input`：检查原始点位，识别完全共址和近似共址点，不合并不同逻辑点。
+- `validate_tour_robot_scene`：校验最终 YAML、跨文件引用、物理导航 ID、源点覆盖和程序限制。
 
 ## 开发验证
 
 ```sh
-npm install --legacy-peer-deps
-npm test
-npm run smoke
-npm pack --dry-run
+pnpm test
+pnpm run smoke
+pnpm pack --dry-run
 ```
-
-随包示例位于 `examples/dynamic-corporate-showroom/scene-ir.json`。
-
-## 许可证
-
-MIT，见 `LICENSE`。
