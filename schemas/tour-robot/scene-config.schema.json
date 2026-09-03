@@ -1,30 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rein.example/schemas/tour-robot/scene-config.schema.json",
   "title": "tour_robot scene_config.yaml",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "required": ["version", "scene_id", "scene_name", "programs"],
   "properties": {
     "version": { "type": ["string", "number"] },
     "scene_id": { "$ref": "#/$defs/id" },
     "scene_name": { "type": "string", "minLength": 1 },
-    "prompt_context": { "type": "object" },
+    "prompt_context": { "type": "object", "additionalProperties": false, "properties": { "venue_name": { "type": "string", "minLength": 1 }, "venue_highlight": { "type": "string" }, "curator_name": { "type": "string" }, "curator_title": { "type": "string" } } },
+    "role": { "type": "string", "minLength": 1 },
+    "language_style": { "type": "string", "minLength": 1 },
     "default_language": { "type": "string", "minLength": 1 },
-    "basic_templates": { "type": "object" },
-    "dynamic_tour": { "type": "object" },
+    "basic_templates": { "$ref": "#/$defs/basicTemplates" },
+    "obstacle_speech": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string", "minLength": 1 } } },
+    "standby_vision_responses": { "$ref": "#/$defs/standbyVision" },
+    "dancegongfu_list": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string", "minLength": 1 } } } },
+    "dynamic_tour": { "$ref": "#/$defs/dynamicTour" },
     "programs": {
       "type": "object",
       "minProperties": 1,
       "additionalProperties": { "$ref": "#/$defs/program" }
     },
-    "special_configs": { "type": "object" }
+    "special_configs": { "$ref": "#/$defs/specialConfigs" }
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
     "program": {
       "type": "object",
-      "additionalProperties": true,
-      "required": ["name", "explain_point_keys"],
+      "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "duration_mode": { "type": "string", "minLength": 1 },
@@ -44,6 +49,24 @@
         "photo_after_explain": { "type": "boolean" },
         "photo_after_explain_use_profile": { "type": "boolean" },
         "photo_point": { "$ref": "#/$defs/id" }
+      }
+    },
+    "basicTemplates": { "type": "object", "additionalProperties": false, "properties": { "welcome_prefix": { "type": "string" }, "farewell_suffix": { "type": "string" }, "busy_prompt": { "type": "string" }, "pause_resume": { "type": "string" }, "position_guide": { "type": "string" }, "unknown_intent": { "type": "string" } } },
+    "standbyVision": { "type": "object", "additionalProperties": false, "properties": { "person_nearby_enabled": { "type": "boolean" }, "person_nearby_gesture": { "type": "string" }, "wave_silent_interval_seconds": { "type": "number", "minimum": 0 }, "person_nearby_speech": { "type": "array", "items": { "type": "string" } } } },
+    "dynamicTour": { "type": "object", "additionalProperties": false, "required": ["enabled"], "properties": { "enabled": { "type": "boolean" }, "compiler_required": { "type": "boolean" }, "startup_source": { "type": "string", "minLength": 1 }, "default_program": { "$ref": "#/$defs/id" }, "default_duration_mode": { "enum": ["full", "express"] }, "default_group_type": { "$ref": "#/$defs/id" }, "default_perspective": { "$ref": "#/$defs/id" }, "default_joke_level": { "type": "integer", "minimum": 0, "maximum": 2 }, "default_interaction_enabled": { "type": "boolean" }, "supported_group_types": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }, "supported_perspectives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }, "supported_duration_modes": { "type": "array", "minItems": 1, "items": { "enum": ["full", "express"] } }, "session_overrides": { "type": "object", "additionalProperties": false, "properties": { "photo_enabled": { "type": "boolean" }, "allow_photo_enable": { "type": "boolean" } } } } },
+    "photoPrepare": { "type": "object", "additionalProperties": false, "properties": { "speech": { "type": "string" } } },
+    "specialConfigs": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "skip_first_point_when_welcome_played": { "type": "boolean" }, "working_hours": { "type": "string" },
+        "start_work_phrase": { "type": "string" }, "stop_work_phrase": { "type": "string" }, "battery_low_phrase": { "type": "string" }, "battery_critical_phrase": { "type": "string" }, "battery_critical_stop_phrase": { "type": "string" }, "emergency_contact": { "type": "string" }, "navigation_blocked_phrase": { "type": "string" }, "localization_lost_phrase": { "type": "string" }, "explain_error_phrase": { "type": "string" }, "network_error_phrase": { "type": "string" }, "safety_notice_phrase": { "type": "string" }, "pad_session_required_phrase": { "type": "string" },
+        "ask_welcome_task_confirm": { "type": "boolean" }, "welcome_task_confirm_timeout_seconds": { "type": "number", "minimum": 0 }, "welcome_task_confirm_speech_wrong": { "type": "string" }, "welcome_greet_speech": { "type": "string" }, "welcome_greet_speech_2": { "type": "string" }, "welcome_greet_gesture": { "type": "string" }, "welcome_greet_gesture_2": { "type": "string" }, "welcome_greet_gesture_delay_2": { "type": "number", "minimum": 0 }, "welcome_lead_speech": { "type": "string" }, "welcome_lead_speech_photo_first": { "type": "string" }, "welcome_lead_gesture": { "type": "string" }, "vip_confirm_timeout_seconds": { "type": "number", "minimum": 0 },
+        "farewell_place_name": { "type": "string" }, "farewell_survey_speech": { "type": "string" }, "farewell_survey_timeout_seconds": { "type": "number", "minimum": 0 }, "survey_base_dir": { "type": "string" },
+        "ask_guide_target_confirm": { "type": "boolean" }, "guide_target_confirm_timeout_seconds": { "type": "number", "minimum": 0 }, "guide_target_confirm_speech_wrong": { "type": "string" }, "ask_coffee_task_confirm": { "type": "boolean" }, "coffee_task_confirm_timeout_seconds": { "type": "number", "minimum": 0 }, "coffee_task_confirm_speech_wrong": { "type": "string" }, "coffee_wait_seconds": { "type": "number", "minimum": 0 },
+        "photo_min_rounds": { "type": "integer", "minimum": 0 }, "photo_max_rounds": { "type": "integer", "minimum": 0 }, "photo_here_prepare": { "$ref": "#/$defs/photoPrepare" }, "photo_default_location_after_explain": { "type": "string" }, "photo_default_location_on_take_photo_with_current_user": { "type": "string" }, "photo_complete_skip_leave_speech": { "type": "boolean" }, "photo_complete_speech_welcome": { "type": "string" }, "skip_confirm_position_for_taking_photo_after_explain": { "type": "boolean" }, "skip_confirm_position_for_taking_photo_on_take_photo_with_current_user": { "type": "boolean" },
+        "explain_complete_stay_seconds": { "type": "number", "minimum": 0 }, "explain_complete_leave_speech": { "type": "string" }, "explain_pause_after_complete_speech": { "type": "boolean" }, "standby_vision_silent_after_explain_seconds": { "type": "number", "minimum": 0 }, "standby_vision_mode": { "type": "string" },
+        "seller_welcome_enabled": { "type": "boolean" }, "seller_welcome_attract_gesture": { "type": "string" }, "seller_welcome_attract_speech": { "type": "string" }, "seller_welcome_confirm_max_distance_mm": { "type": "number", "minimum": 0 }, "seller_welcome_confirm_vision_action": { "type": "string" }, "seller_welcome_cooldown_seconds": { "type": "number", "minimum": 0 }, "seller_welcome_greet_gesture": { "type": "string" }, "seller_welcome_greet_gesture_2": { "type": "string" }, "seller_welcome_greet_gesture_delay_2": { "type": "number", "minimum": 0 }, "seller_welcome_greet_speech": { "type": "string" }, "seller_welcome_greet_speech_2": { "type": "string" }, "seller_welcome_vip_name": { "type": "string" }, "seller_welcome_wait_seconds": { "type": "number", "minimum": 0 },
+        "capshow_leave_photo_speech": { "type": "string" }, "game_rps_execution_brain_url": { "type": "string" }, "game_rps_rounds": { "type": "integer", "minimum": 1 }, "dance_again_speech_list": { "type": "array", "items": { "type": "string" } }, "dance_again_timeout_seconds": { "type": "number", "minimum": 0 }, "dance_choice_require_name_speech": { "type": "string" }, "dance_choice_timeout_seconds": { "type": "number", "minimum": 0 }, "dance_trigger_speech_template": { "type": "string" }
       }
     }
   }

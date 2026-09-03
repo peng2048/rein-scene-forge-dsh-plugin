@@ -1,8 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rein.example/schemas/tour-robot/reception-pack.schema.json",
   "title": "tour_robot reception_pack.yaml",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "required": ["scene_id", "personas"],
   "properties": {
     "scene_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
@@ -13,20 +14,31 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     },
+    "region_greetings": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } },
+    "condition_aliases": { "type": "object", "additionalProperties": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } } },
+    "legacy_group_types": { "type": "object", "additionalProperties": { "$ref": "#/$defs/legacyMapping" } },
     "personas": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "additionalProperties": true,
+        "additionalProperties": false,
         "required": ["id", "label"],
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "label": { "type": "string", "minLength": 1 },
+          "group": { "type": "string" },
           "audience_title": { "type": "string" },
-          "defaults": { "type": "object" }
+          "focus": { "type": "array", "items": { "$ref": "#/$defs/focus" } },
+          "defaults": { "$ref": "#/$defs/personaDefaults" }
         }
       }
     }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "focus": { "type": "object", "additionalProperties": false, "required": ["id", "label"], "properties": { "id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1 } } },
+    "personaDefaults": { "type": "object", "additionalProperties": false, "properties": { "priority": { "enum": ["high", "medium_high", "medium", "low"] }, "joke_level": { "type": "integer", "minimum": 0, "maximum": 2 }, "photo_enabled": { "type": "boolean" }, "interaction_enabled": { "type": "boolean" }, "duration_mode": { "enum": ["full", "express"] }, "pacing": { "enum": ["station", "flowing"] }, "perspective": { "$ref": "#/$defs/id" } } },
+    "legacyMapping": { "type": "object", "additionalProperties": false, "required": ["group_type"], "properties": { "group_type": { "$ref": "#/$defs/id" }, "perspective": { "$ref": "#/$defs/id" }, "visitor_region": { "enum": ["hangzhou", "zhejiang", "domestic", "foreign"] } } }
   }
 }

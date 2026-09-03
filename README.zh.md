@@ -26,21 +26,24 @@
 
 AI 可读取：
 
+- `skills/robot-scene-authoring/references/model-catalog.md`（字段选择的权威清单）
 - `skills/robot-scene-authoring/references/tour-robot-data-model.md`
 - `skills/robot-scene-authoring/templates/*.template.yaml`
 
 确定性工具使用：
 
+- `schemas/authoring/authoring-model.schema.json`
 - `schemas/tour-robot/map-config.schema.json`
 - `schemas/tour-robot/scene-config.schema.json`
 - `schemas/tour-robot/explain-config.schema.json`
 - `schemas/tour-robot/reception-pack.schema.json`
 
-模板提供默认骨架；Schema 同时描述运行时支持的可选字段。可选能力只有在用户输入或确认要求时才使用。
+内部作者模型直接包含四份目标配置对象，不做字段翻译。目标 Schema 的字段来自真实 `tour_robot` 配置和消费者；未知目标字段会被拒绝。模板只提供默认骨架，可选能力只有在用户输入或确认要求时才使用。
 
 ## 工具
 
 - `analyze_point_input`：检查原始点位，识别完全共址和近似共址点，不合并不同逻辑点。
+- `validate_authoring_model`：在写 YAML 前校验完整内部作者模型和四份目标配置对象。
 - `validate_tour_robot_scene`：校验最终 YAML、跨文件引用、物理导航 ID、源点覆盖和程序限制。
 
 ## 开发验证

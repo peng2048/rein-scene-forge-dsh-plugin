@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
-import { stringify } from "yaml";
-import { analyzePointInput, validateTourRobotScene } from "../lib/runtime.js";
+import { parse, stringify } from "yaml";
+import { analyzePointInput, validateAuthoringModel, validateTourRobotScene } from "../lib/runtime.js";
 
 const points = [
   { id: 3, name: "welcome", x: -0.49, y: -28.3, yaw: 180 },
@@ -63,5 +63,25 @@ test("rejects omitted source points and explain physical id mismatch", async () 
     assert.equal(result.is_valid, false);
     assert.ok(result.diagnostics.some((item) => item.code === "RSF_SOURCE_POINTS_OMITTED"));
     assert.ok(result.diagnostics.some((item) => item.code === "RSF_EXPLAIN_MAP_POINT_UNKNOWN"));
+  });
+});
+
+test("validates an authoring envelope composed from exact target models", async () => {
+  await workspace(async () => {
+    await writeScene();
+    const readYaml = async (name) => parse(await readFile(`demo/${name}`, "utf8"));
+    const model = {
+      model_version: "1.0",
+      point_input: points,
+      source_materials: [{ source_material_id: "source_main", file_path: "narration.md", media_type: "markdown", sha256: "a".repeat(64) }],
+      map_config: await readYaml("map_config.yaml"),
+      scene_config: await readYaml("scene_config.yaml"),
+      explain_config: await readYaml("explain_config.yaml"),
+      content_trace: [],
+      authoring_decisions: []
+    };
+    assert.deepEqual(await validateAuthoringModel(model), []);
+    model.scene_config.invented_field = true;
+    assert.ok((await validateAuthoringModel(model)).some((item) => item.code === "RSF_AUTHORING_MODEL_INVALID"));
   });
 });

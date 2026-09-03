@@ -13,6 +13,7 @@
     "lib/**/*.js",
     "skills/**/*.md",
     "skills/**/*.yaml",
+    "schemas/authoring/*.schema.json",
     "schemas/tour-robot/*.schema.json",
     "cordis.patch.yml",
     "README.md",

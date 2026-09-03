@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rein.example/schemas/authoring-model.schema.json",
+  "title": "Rein tour_robot Authoring Model",
+  "description": "The four real tour_robot target contracts plus non-runtime provenance records.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["model_version", "point_input", "source_materials", "map_config", "scene_config", "explain_config", "content_trace", "authoring_decisions"],
+  "properties": {
+    "model_version": { "const": "1.0" },
+    "point_input": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourcePoint" } },
+    "source_materials": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourceMaterial" } },
+    "map_config": { "$ref": "https://rein.example/schemas/tour-robot/map-config.schema.json" },
+    "scene_config": { "$ref": "https://rein.example/schemas/tour-robot/scene-config.schema.json" },
+    "explain_config": { "$ref": "https://rein.example/schemas/tour-robot/explain-config.schema.json" },
+    "reception_pack": { "$ref": "https://rein.example/schemas/tour-robot/reception-pack.schema.json" },
+    "content_trace": { "type": "array", "items": { "$ref": "#/$defs/contentTrace" } },
+    "authoring_decisions": { "type": "array", "items": { "$ref": "#/$defs/decision" } },
+    "unresolved_items": { "type": "array", "items": { "$ref": "#/$defs/unresolved" }, "default": [] }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "sourcePoint": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "name", "x", "y", "yaw"],
+      "properties": { "id": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "integer" }] }, "name": { "$ref": "#/$defs/nonEmpty" }, "x": { "type": "number" }, "y": { "type": "number" }, "yaw": { "type": "number" } }
+    },
+    "sourceMaterial": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_material_id", "file_path", "media_type", "sha256"],
+      "properties": { "source_material_id": { "$ref": "#/$defs/id" }, "file_path": { "$ref": "#/$defs/nonEmpty" }, "media_type": { "enum": ["text", "markdown", "pdf", "docx", "spreadsheet", "image", "other"] }, "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }, "title": { "type": "string" } }
+    },
+    "sourceReference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_reference_id", "source_material_id", "locator", "excerpt"],
+      "properties": { "source_reference_id": { "$ref": "#/$defs/id" }, "source_material_id": { "$ref": "#/$defs/id" }, "locator": { "$ref": "#/$defs/nonEmpty" }, "excerpt": { "$ref": "#/$defs/nonEmpty" } }
+    },
+    "contentTrace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["trace_id", "yaml_path", "text", "sentence_type", "transformation", "source_references", "requires_confirmation"],
+      "properties": { "trace_id": { "$ref": "#/$defs/id" }, "yaml_path": { "$ref": "#/$defs/nonEmpty" }, "text": { "$ref": "#/$defs/nonEmpty" }, "sentence_type": { "enum": ["source_fact", "paraphrase", "transition", "instruction", "interaction", "runtime_template"] }, "transformation": { "enum": ["verbatim", "light_edit", "paraphrase", "summary", "generated_non_factual"] }, "source_references": { "type": "array", "items": { "$ref": "#/$defs/sourceReference" } }, "generation_reason": { "type": "string" }, "requires_confirmation": { "type": "boolean" } }
+    },
+    "decision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["decision_id", "decision_type", "yaml_path", "decision", "reason", "confirmation_status"],
+      "properties": { "decision_id": { "$ref": "#/$defs/id" }, "decision_type": { "enum": ["point_mapping", "route_order", "content_edit", "workflow_role", "capability", "omission"] }, "yaml_path": { "$ref": "#/$defs/nonEmpty" }, "decision": { "$ref": "#/$defs/nonEmpty" }, "reason": { "$ref": "#/$defs/nonEmpty" }, "confirmation_status": { "enum": ["not_required", "pending", "confirmed", "rejected"] } }
+    },
+    "unresolved": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "category", "message", "blocking"],
+      "properties": { "item_id": { "$ref": "#/$defs/id" }, "category": { "enum": ["point_mapping", "source_conflict", "missing_input", "capability", "content"] }, "message": { "$ref": "#/$defs/nonEmpty" }, "blocking": { "type": "boolean" } }
+    }
+  }
+}

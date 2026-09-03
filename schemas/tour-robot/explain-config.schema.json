@@ -1,15 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rein.example/schemas/tour-robot/explain-config.schema.json",
   "title": "tour_robot explain_config.yaml",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "required": ["version", "scene_id", "max_explain_points", "max_segments_per_point", "areas"],
   "properties": {
     "version": { "type": ["string", "number"] },
     "scene_id": { "$ref": "#/$defs/id" },
     "max_explain_points": { "type": "integer", "minimum": 1 },
     "max_segments_per_point": { "type": "integer", "minimum": 1, "maximum": 16 },
-    "planning_rules": { "type": "object" },
+    "max_duration_limit": { "type": "number", "minimum": 0 },
+    "human_companion_name": { "type": "string" },
+    "planning_rules": { "$ref": "#/$defs/planningRules" },
+    "route_presets": { "type": "object", "additionalProperties": { "$ref": "#/$defs/routePreset" } },
+    "reception": { "$ref": "#/$defs/reception" },
+    "metadata": { "type": "object" },
+    "runtime_config_version": { "oneOf": [{ "type": "string" }, { "type": "integer" }, { "type": "null" }] },
+    "runtime_config_session_id": { "oneOf": [{ "type": "string" }, { "type": "integer" }, { "type": "null" }] },
     "areas": {
       "type": "object",
       "minProperties": 1,
@@ -21,7 +29,7 @@
     "pointId": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "integer" }] },
     "area": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": ["id", "name", "description", "narrator", "points"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
@@ -37,8 +45,8 @@
     },
     "explainPoint": {
       "type": "object",
-      "additionalProperties": true,
-      "required": ["id", "name", "map_point", "point_id", "narrator", "estimated_duration", "priority", "after_point_explain", "segments"],
+      "additionalProperties": false,
+      "required": ["id", "name", "map_point", "point_id", "narrator", "estimated_duration", "priority", "segments"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "name": { "type": "string", "minLength": 1 },
@@ -47,6 +55,7 @@
         "dbg_point_id": { "$ref": "#/$defs/pointId" },
         "narrator": { "type": "string", "minLength": 1 },
         "tags": { "type": "array", "items": { "type": "string" } },
+        "keywords": { "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }] },
         "estimated_duration": { "type": "number", "minimum": 0 },
         "priority": { "type": "integer", "minimum": 0 },
         "after_point_explain": { "enum": ["direct", "ask_questions", "dwell_continue"] },
@@ -55,27 +64,95 @@
           "minProperties": 1,
           "additionalProperties": { "$ref": "#/$defs/segment" }
         },
-        "approach": { "type": "object" },
-        "passing": { "type": "object" }
+        "dwell_continue_intro": { "type": "string" },
+        "dwell_continue_seconds": { "type": "number", "minimum": 0, "maximum": 3600 },
+        "dwell_continue_outro": { "type": "string" },
+        "conditions": { "$ref": "#/$defs/conditions" },
+        "approach": { "$ref": "#/$defs/movementMode" },
+        "passing": { "$ref": "#/$defs/movementMode" }
       }
     },
     "segment": {
       "type": "object",
-      "additionalProperties": true,
-      "required": ["id", "name", "content", "estimated_duration", "is_mandatory"],
+      "additionalProperties": false,
+      "required": ["id", "name", "content", "estimated_duration"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "name": { "type": "string", "minLength": 1 },
         "content": { "type": "string", "minLength": 1 },
         "gesture": { "type": "string", "minLength": 1 },
+        "narrator": { "enum": ["robot", "human"] },
         "tags": { "type": "array", "items": { "type": "string" } },
         "estimated_duration": { "type": "number", "minimum": 0 },
         "is_mandatory": { "type": "boolean" },
-        "conditions": { "type": "object" },
+        "conditions": { "$ref": "#/$defs/conditions" },
         "dynamic_only": { "type": "boolean" },
-        "variants": { "type": "array", "minItems": 1 },
-        "pause_after_seconds": { "type": "number", "minimum": 0, "maximum": 300 }
+        "variants": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/variant" } },
+        "pause_after_seconds": { "type": "number", "minimum": 0, "maximum": 300 },
+        "wait_for_continue_prompt": { "type": "string" },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+        "shuffle_group": { "type": "string", "minLength": 1 },
+        "shuffle_keep": { "type": "boolean" },
+        "shuffle_pick": { "type": "integer", "minimum": 1 }
       }
+    },
+    "conditions": {
+      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "properties": {
+        "group_types": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+        "perspectives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+        "duration_modes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+        "pacing_modes": { "type": "array", "minItems": 1, "items": { "enum": ["station", "flowing"] } },
+        "interaction_enabled": { "type": "boolean" }, "photo_enabled": { "type": "boolean" },
+        "min_joke_level": { "type": "integer", "minimum": 0, "maximum": 2 }, "max_joke_level": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "jieqi": { "type": "array", "items": { "type": "string" } }, "festivals": { "type": "array", "items": { "type": "string" } },
+        "jieqi_on_day": { "type": "boolean" }, "min_days_to_festival": { "type": "integer", "minimum": 0, "maximum": 60 },
+        "max_days_to_festival": { "type": "integer", "minimum": 0, "maximum": 60 }
+      }
+    },
+    "variant": {
+      "type": "object", "additionalProperties": false, "required": ["id", "content"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "content": { "type": "string", "minLength": 1 }, "conditions": { "$ref": "#/$defs/conditions" }, "weight": { "type": "number", "minimum": 0 }, "gesture": { "type": "string", "minLength": 1 } }
+    },
+    "action": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type"], "properties": { "type": { "type": "string", "minLength": 1 } }
+    },
+    "movementSegment": {
+      "type": "object", "additionalProperties": false, "required": ["content"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "content": { "type": "string", "minLength": 1 }, "trigger": { "type": "string", "pattern": "^(on_start|on_waypoint:[0-9]+|on_progress:(0(\\.[0-9]+)?|1(\\.0+)?))$" }, "gesture": { "type": "string" }, "conditions": { "$ref": "#/$defs/conditions" }, "variants": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/variant" } } }
+    },
+    "movementRoute": {
+      "type": "object", "additionalProperties": false, "required": ["segments"],
+      "properties": { "from": { "$ref": "#/$defs/id" }, "waypoints": { "type": "array", "items": { "$ref": "#/$defs/pointId" } }, "dbg_waypoints": { "type": "array", "items": { "$ref": "#/$defs/pointId" } }, "switch_threshold": { "type": "number", "minimum": 0.5, "maximum": 0.95 }, "segments": { "oneOf": [{ "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/movementSegment" } }, { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/movementSegment" } }] } }
+    },
+    "movementMode": {
+      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "properties": { "default": { "$ref": "#/$defs/movementRoute" }, "overrides": { "type": "array", "items": { "$ref": "#/$defs/movementRoute" } } }
+    },
+    "planningRules": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "mandatory_tags": { "type": "array", "items": { "type": "string" } }, "duration_matching": { "type": "boolean" },
+        "max_points_per_session": { "type": "integer", "minimum": 1 }, "max_duration_limit": { "type": "number", "minimum": 0 }, "default_duration": { "type": "number", "minimum": 0 },
+        "after_point_explain_default": { "enum": ["direct", "ask_questions", "dwell_continue"] }, "random_sample_count": { "type": "integer", "minimum": 0 }, "random_sample_tags": { "type": "array", "items": { "type": "string" } },
+        "ask_duration_before_explain": { "type": "boolean" }, "duration_options_minutes": { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 } }, "duration_choice_timeout_seconds": { "type": "number", "minimum": 0 },
+        "ask_wait_seconds": { "type": "number", "minimum": 0 }, "ask_idle_seconds": { "type": "number", "minimum": 0 }, "ask_questions_speech": { "type": "string" },
+        "ask_questions_closing_speech": { "type": "string" }, "ask_questions_closing_early_speech": { "type": "string" }, "ask_questions_closing_timeout_speech": { "type": "string" },
+        "ask_non_whitelist_defer_speech": { "type": "string" }, "ask_reopen_prompt_speech": { "type": "string" }, "ask_reopen_min_remaining_seconds": { "type": "number", "minimum": 0 },
+        "ask_midbrain_qa_segment_end_debounce_seconds": { "type": "number", "minimum": 0 }, "ask_midbrain_qa_chunk_gap_seconds": { "type": "number", "minimum": 0 },
+        "ask_midbrain_qa_trailing_seconds": { "type": "number", "minimum": 0 }, "ask_midbrain_qa_short_segment_seconds": { "type": "number", "minimum": 0 }, "ask_midbrain_outro_quiet_max_seconds": { "type": "number", "minimum": 0 },
+        "dwell_continue_intro": { "type": "string" }, "dwell_continue_seconds": { "type": "number", "minimum": 0 }, "dwell_continue_outro": { "type": "string" },
+        "dwell_wakeup_grace_seconds": { "type": "number", "minimum": 0 }, "intent_stale_max_seconds": { "type": "number", "minimum": 0 }, "content_match_min_coverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "routePreset": {
+      "type": "object", "additionalProperties": false, "required": ["point_keys"],
+      "properties": { "point_keys": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }, "stop_keys": { "type": "array", "items": { "$ref": "#/$defs/id" } } }
+    },
+    "reception": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "route_presets": { "type": "object", "additionalProperties": { "$ref": "#/$defs/routePreset" } }, "pass_through_keys": { "type": "array", "items": { "$ref": "#/$defs/id" } } }
     }
   }
 }

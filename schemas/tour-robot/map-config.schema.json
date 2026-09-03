@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rein.example/schemas/tour-robot/map-config.schema.json",
   "title": "tour_robot map_config.yaml",
   "type": "object",
   "additionalProperties": false,
