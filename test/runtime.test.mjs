@@ -74,6 +74,19 @@ test("reports loader warnings and unreachable explain points", async () => {
   });
 });
 
+test("reports misplaced welcome and farewell execution points", async () => {
+  await workspace(async () => {
+    await writeScene();
+    const scene = parse(await readFile("demo/scene_config.yaml", "utf8"));
+    scene.programs.full.explain_point_keys = ["farewell_end", "welcome_start"];
+    await writeFile("demo/scene_config.yaml", stringify(scene));
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_WELCOME_NOT_FIRST"));
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_PROGRAM_FAREWELL_NOT_LAST"));
+    assert.equal(result.is_publishable, false);
+  });
+});
+
 test("rejects a scene directory that does not match scene_id", async () => {
   await workspace(async () => {
     await writeScene();

@@ -39,6 +39,16 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 - A source section with no reliable point match is a blocking mismatch and must be reported.
 - A source point with no confirmed purpose remains in `map_config.yaml`; report it and ask whether it is a waypoint, service destination, explain stop, or unused point.
 
+## Program Completeness Rules
+
+- Treat `programs.*.explain_point_keys` as the only runtime-authoritative execution order.
+- For every newly generated Program, explicitly set `name`, `duration_mode`, `explain_point_keys`, `photo_enabled`, `photo_point`, `photo_before_explain`, `photo_after_explain`, and `photo_after_explain_use_profile`.
+- Use a user-confirmed `photo_point`. When photography is not requested, keep every photo behavior flag false; do not omit the fields or invent a location.
+- Put a Program's confirmed welcome Explain Point first and its confirmed farewell Explain Point last.
+- Include every intended Explain Point in at least one Program. Never leave generated narration unreachable.
+- Preserve the confirmed physical visit order. Coordinates alone do not establish a safe or intended route.
+- Treat every Program diagnostic as blocking publication, including warnings, until corrected or regenerated from an explicit user decision.
+
 ## Tools
 
 - `analyze_point_input`: validates raw points and reports exact/near physical poses without merging logical points.

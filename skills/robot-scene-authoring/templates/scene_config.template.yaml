@@ -18,8 +18,16 @@ basic_templates:
 programs:
   full:
     name: "完整导览"
+    duration_mode: "full"
+    photo_enabled: false
+    photo_point: "<confirmed_photo_or_safe_base_map_point_key>"
+    photo_before_explain: false
+    photo_after_explain: false
+    photo_after_explain_use_profile: false
     explain_point_keys:
-      - "<confirmed_explain_point_key>"
+      - "<confirmed_welcome_explain_point_key>"
+      - "<confirmed_business_explain_point_key>"
+      - "<confirmed_farewell_explain_point_key>"
 
 # Optional blocks selected only from confirmed requirements:
 # obstacle_speech: ...

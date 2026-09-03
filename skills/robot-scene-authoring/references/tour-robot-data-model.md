@@ -78,6 +78,12 @@ basic_templates:
 programs:
   full:
     name: "完整导览"
+    duration_mode: "full"
+    photo_enabled: false
+    photo_point: "photo1"
+    photo_before_explain: false
+    photo_after_explain: false
+    photo_after_explain_use_profile: false
     explain_point_keys:
       - welcome_start
       - exhibit_one
@@ -88,7 +94,7 @@ Rules:
 - `programs.*.explain_point_keys` is the actual runtime route and order.
 - Do not emit `point_sequence`; the current Python runtime does not use it.
 - Every listed Explain Point must exist.
-- Add `photo_point`, `photo_before_explain`, or `photo_after_explain` only after explicit confirmation.
+- Set `photo_point` explicitly to a confirmed map point because the real loader warns when it is absent. When no photo workflow is requested, keep `photo_enabled`, `photo_before_explain`, `photo_after_explain`, and `photo_after_explain_use_profile` false. Do not infer a photo location.
 - Add `dynamic_tour` only when dynamic reception compilation is actually used.
 - Add `special_configs`, standby vision, gestures, work hours, battery speech, and similar features only when explicitly supported and confirmed.
 
