@@ -1,6 +1,6 @@
 {
   "name": "rein-scene-forge-dsh-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DeepSeek Harness Skill and deterministic validators for generating tour_robot YAML from points.json and narration material.",
   "type": "module",
   "main": "./lib/index.js",
