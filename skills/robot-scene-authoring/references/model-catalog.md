@@ -14,7 +14,7 @@ The internal model is a workspace envelope. Its `map_config`, `scene_config`, `e
 | `map_config` | yes | Exact `map_config.yaml` object. |
 | `scene_config` | yes | Exact `scene_config.yaml` object. |
 | `explain_config` | yes | Exact `explain_config.yaml` object. |
-| `reception_pack` | no | Exact `reception_pack.yaml` object for dynamic PAD reception. |
+| `reception_pack` | yes | Exact `reception_pack.yaml` object for dynamic PAD reception; the model requires the fixed nine Persona IDs. |
 | `content_trace` | yes | Non-runtime sentence/source records keyed by exact YAML paths. |
 | `authoring_decisions` | yes | Non-runtime point, route, content and capability decisions. |
 | `unresolved_items` | no | Blocking and non-blocking questions. |
@@ -62,6 +62,8 @@ Top level: `scene_id`, `scene_name`, `languages`, `region_greetings`, `condition
 Persona fields: `id`, `label`, `group`, `audience_title`, `focus`, `defaults`. Defaults support `priority`, `joke_level`, `photo_enabled`, `interaction_enabled`, `duration_mode`, `pacing`, and `perspective`.
 
 ## Required Versus Recommended
+
+The authoring model is dynamic: `reception_pack.personas` contains exactly nine fixed IDs (`government`, `industry`, `experts`, `university`, `middle_school`, `primary_school`, `family_with_child`, `adult`, `senior`). Expression intensity is the existing runtime `joke_level` with values `0` formal, `1` relaxed, and `2` humorous. Audience and intensity variation is represented by target fields `conditions` and `variants`, not by separate YAML files.
 
 Schema-required means the real runtime cannot safely consume the object without the field. The Skill may require additional fields for newly generated scenes to avoid legacy fallbacks. In particular, new Explain Points always set `after_point_explain`; new Segments always set `is_mandatory`; new Programs always set `name` and `explain_point_keys`.
 

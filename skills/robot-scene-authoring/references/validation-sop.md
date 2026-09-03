@@ -67,6 +67,10 @@ Compare the final Segments against the source material section by section.
 4. Confirm Segment order preserves the source narrative unless reordering was approved.
 5. Confirm estimated durations are plausible for the actual text and Program totals.
 
+6. Confirm the dynamic authoring model has the fixed nine Personas, PAD compiler enabled, and no audience-specific static YAML copies.
+7. Confirm each atomic fact has short base and Variant content of at most 40 characters; inspect Variants for semantic equivalence and Conditions for justified optionality.
+8. Review formal level 0, relaxed level 1, and humorous level 2 wording separately. Do not require artificial differences where the source or audience does not justify them.
+
 Unresolved source omissions, factual changes, or invented content block publication.
 
 ## Gate 7: Publication Decision

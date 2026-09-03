@@ -97,6 +97,25 @@ test("reports misplaced welcome and farewell execution points", async () => {
   });
 });
 
+test("reports base and variant speech over forty characters", async () => {
+  await workspace(async () => {
+    await writeScene();
+    const explain = parse(await readFile("demo/explain_config.yaml", "utf8"));
+    const segment = explain.areas.main.points.welcome_start.segments.opening;
+    segment.content = "这是一段超过四十个字符的基础讲解话术，用于确认校验器会要求人工在自然语义边界继续拆分内容。";
+    segment.variants = [{
+      id: "kids",
+      content: "这是一段同样超过四十个字符的儿童变体话术，用于确认变体内容也会执行完全相同的长度检查。",
+      conditions: { group_types: ["primary_school"] }
+    }];
+    await writeFile("demo/explain_config.yaml", stringify(explain));
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    const longContent = result.diagnostics.filter((item) => item.code === "RSF_CONTENT_SEGMENT_TOO_LONG");
+    assert.equal(longContent.length, 2);
+    assert.equal(result.is_publishable, false);
+  });
+});
+
 test("rejects a scene directory that does not match scene_id", async () => {
   await workspace(async () => {
     await writeScene();
@@ -131,6 +150,9 @@ test("validates an authoring envelope composed from exact target models", async 
       map_config: await readYaml("map_config.yaml"),
       scene_config: await readYaml("scene_config.yaml"),
       explain_config: await readYaml("explain_config.yaml"),
+      reception_pack: { scene_id: "demo", personas: [
+        "government", "industry", "experts", "university", "middle_school", "primary_school", "family_with_child", "adult", "senior"
+      ].map((id) => ({ id, label: id })) },
       content_trace: [],
       authoring_decisions: []
     };

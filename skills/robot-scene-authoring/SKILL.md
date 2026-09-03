@@ -50,6 +50,17 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 - Preserve the confirmed physical visit order. Coordinates alone do not establish a safe or intended route.
 - Treat every Program diagnostic as blocking publication, including warnings, until corrected or regenerated from an explicit user decision.
 
+## Fine-Grained Dynamic Narration
+
+- Generate a dynamic authoring configuration for the fixed nine Personas; do not create separate static YAML files per audience or tone.
+- Keep one short base Segment for each atomic fact, exhibit state, transition, question, or action. Split at natural sentence or fact boundaries; target 6-40 Chinese characters and never exceed 40 characters per spoken `content` or Variant `content`.
+- Do not truncate, compress away qualifiers, or break a proper noun merely to meet the limit. Continue the same fact in the next ordered Segment when one accurate sentence cannot fit.
+- Use `variants` when the same fact needs a different audience-appropriate expression. Use `conditions` plus `dynamic_only: true` when a sentence is optional and should be included only for a matching Persona, `joke_level`, duration mode, interaction, photo state, or calendar condition.
+- Treat `joke_level: 0` as formal, `1` as relaxed, and `2` as humorous. The level changes tone and explanation method, never facts, numbers, names, dates, qualifications, or conclusions.
+- Cover all nine Personas in the review. Reuse the base Segment when no meaningful adaptation is needed; do not manufacture differences just to increase Variant counts.
+- Polish spoken Chinese for rhythm, address, transitions, and comprehension while retaining source-grounded meaning. Do not add unsupported claims, spatial directions, gestures, capabilities, or promises.
+- Preserve source facts in the base Segment and record the source reference in the internal authoring envelope. Every Variant must be semantically equivalent to its base fact.
+
 ## Tools
 
 - `get_authoring_rules`: loads the versioned rules and publication policy; invoke it before generation.

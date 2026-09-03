@@ -19,7 +19,20 @@
     "legacy_group_types": { "type": "object", "additionalProperties": { "$ref": "#/$defs/legacyMapping" } },
     "personas": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "government" } } },
+      "allOf": [
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "industry" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "experts" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "university" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "middle_school" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "primary_school" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "family_with_child" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "adult" } } } },
+        { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "senior" } } } }
+      ],
       "items": {
         "type": "object",
         "additionalProperties": false,

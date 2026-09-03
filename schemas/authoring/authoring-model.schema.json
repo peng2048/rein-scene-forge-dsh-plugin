@@ -5,7 +5,7 @@
   "description": "The four real tour_robot target contracts plus non-runtime provenance records.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["model_version", "point_input", "source_materials", "map_config", "scene_config", "explain_config", "content_trace", "authoring_decisions"],
+  "required": ["model_version", "point_input", "source_materials", "map_config", "scene_config", "explain_config", "reception_pack", "content_trace", "authoring_decisions"],
   "properties": {
     "model_version": { "const": "1.0" },
     "point_input": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourcePoint" } },
