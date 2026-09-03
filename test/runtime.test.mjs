@@ -1,62 +1,67 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
-import {
-  compileTourRobotScene,
-  validateSceneIr,
-  verifyScenePackage
-} from "../lib/runtime.js";
+import { stringify } from "yaml";
+import { analyzePointInput, validateTourRobotScene } from "../lib/runtime.js";
 
-const fixture = resolve("examples/dynamic-corporate-showroom/scene-ir.json");
+const points = [
+  { id: 3, name: "welcome", x: -0.49, y: -28.3, yaw: 180 },
+  { id: 4, name: "farewell", x: -0.49, y: -28.3, yaw: 180 }
+];
 
-async function inTemporaryWorkspace(run) {
+async function workspace(run) {
   const previous = process.cwd();
   const directory = await mkdtemp(resolve(tmpdir(), "rein-scene-forge-"));
   process.chdir(directory);
-  try { await run(directory); } finally { process.chdir(previous); await rm(directory, { recursive: true, force: true }); }
+  try { await run(); } finally { process.chdir(previous); await rm(directory, { recursive: true, force: true }); }
 }
 
-test("validates and compiles the dynamic corporate showroom", async () => {
-  await inTemporaryWorkspace(async () => {
-    const sceneIr = JSON.parse(await readFile(fixture, "utf8"));
-    await writeFile("scene-ir.json", `${JSON.stringify(sceneIr, null, 2)}\n`);
-    const validation = await validateSceneIr({ input_path: "scene-ir.json", output_path: "scene-ir-validation.json" });
-    assert.equal(validation.is_valid, true);
-    const compiled = await compileTourRobotScene({ scene_ir_path: "scene-ir.json", output_directory: "package" });
-    assert.equal(compiled.is_valid, true);
-    for (const path of [
-      "Target/tour_robot/map_config.yaml", "Target/tour_robot/scene_config.yaml",
-      "Target/tour_robot/explain_config.yaml", "Target/tour_robot/reception_pack.yaml",
-      "Target/tour_robot/pad-profile-schema.json", "manifest.json", "validation-report.json",
-      "summary.json", "traceability.json", "import-guide.md"
-    ]) assert.ok(compiled.files.includes(path), path);
-    const verification = await verifyScenePackage({ package_directory: "package", output_path: "verification.json" });
-    assert.equal(verification.is_valid, true);
+async function writeScene({ farewellPointId = "4", includeFarewell = true } = {}) {
+  await mkdir("demo", { recursive: true });
+  await writeFile("points.json", JSON.stringify(points));
+  const mapPoints = {
+    welcome1: { name: "迎宾", point_id: "3", type: "base", accessible: true }
+  };
+  if (includeFarewell) mapPoints.farewell1 = { name: "送别", point_id: "4", type: "base", accessible: true };
+  await writeFile("demo/map_config.yaml", stringify({ version: "1.0", scene_id: "demo", points: mapPoints }));
+  await writeFile("demo/scene_config.yaml", stringify({ version: "1.0", scene_id: "demo", scene_name: "演示场景", programs: { full: { name: "完整导览", explain_point_keys: ["welcome_start", "farewell_end"] } } }));
+  await writeFile("demo/explain_config.yaml", stringify({
+    version: "2.0", scene_id: "demo", max_explain_points: 2, max_segments_per_point: 16,
+    areas: { main: { id: "main", name: "主区", description: "", narrator: "robot", points: {
+      welcome_start: { id: "welcome_start", name: "迎宾", map_point: "welcome1", point_id: "3", narrator: "robot", estimated_duration: 10, priority: 1, after_point_explain: "direct", segments: { opening: { id: "opening", name: "欢迎", content: "欢迎参观。", estimated_duration: 10, is_mandatory: true } } },
+      farewell_end: { id: "farewell_end", name: "送别", map_point: "farewell1", point_id: farewellPointId, narrator: "robot", estimated_duration: 10, priority: 2, after_point_explain: "direct", segments: { ending: { id: "ending", name: "送别", content: "感谢参观。", estimated_duration: 10, is_mandatory: true } } }
+    } } }
+  }));
+}
+
+test("point analysis preserves distinct logical points at one pose", async () => {
+  await workspace(async () => {
+    await writeFile("points.json", JSON.stringify(points));
+    const result = await analyzePointInput({ input_path: "points.json" });
+    assert.equal(result.is_valid, true);
+    assert.equal(result.point_count, 2);
+    assert.deepEqual(result.exact_pose_groups[0].point_ids, [3, 4]);
+    assert.equal(result.points[0].suggested_map_key, "welcome1");
+    assert.equal(result.points[1].suggested_map_key, "farewell1");
   });
 });
 
-test("verification detects a modified manifest-listed file", async () => {
-  await inTemporaryWorkspace(async () => {
-    const sceneIr = JSON.parse(await readFile(fixture, "utf8"));
-    await writeFile("scene-ir.json", JSON.stringify(sceneIr));
-    await compileTourRobotScene({ scene_ir_path: "scene-ir.json", output_directory: "package" });
-    await writeFile("package/Target/tour_robot/map_config.yaml", "tampered: true\n");
-    const verification = await verifyScenePackage({ package_directory: "package", output_path: "verification.json" });
-    assert.equal(verification.is_valid, false);
-    assert.ok(verification.diagnostics.some((item) => item.code === "RSF_PACKAGE_HASH_MISMATCH"));
+test("validates a minimal scene against bundled model", async () => {
+  await workspace(async () => {
+    await writeScene();
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    assert.equal(result.is_valid, true, JSON.stringify(result.diagnostics));
   });
 });
 
-test("compile refuses a non-empty output directory without force", async () => {
-  await inTemporaryWorkspace(async () => {
-    const sceneIr = JSON.parse(await readFile(fixture, "utf8"));
-    await writeFile("scene-ir.json", JSON.stringify(sceneIr));
-    await compileTourRobotScene({ scene_ir_path: "scene-ir.json", output_directory: "package" });
-    await assert.rejects(
-      compileTourRobotScene({ scene_ir_path: "scene-ir.json", output_directory: "package" }),
-      /force=true/
-    );
+test("rejects omitted source points and explain physical id mismatch", async () => {
+  await workspace(async () => {
+    await writeScene({ farewellPointId: "3", includeFarewell: false });
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    assert.equal(result.is_valid, false);
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_SOURCE_POINTS_OMITTED"));
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_EXPLAIN_MAP_POINT_UNKNOWN"));
   });
 });

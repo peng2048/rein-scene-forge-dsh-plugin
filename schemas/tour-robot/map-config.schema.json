@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tour_robot map_config.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "scene_id", "points"],
+  "properties": {
+    "version": { "type": ["string", "number"] },
+    "scene_id": { "$ref": "#/$defs/id" },
+    "points": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/point" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "pointId": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "integer" }] },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "point_id"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "point_id": { "$ref": "#/$defs/pointId" },
+        "dbg_point_id": { "$ref": "#/$defs/pointId" },
+        "type": { "enum": ["base", "business", "waypoint"] },
+        "description": { "type": "string" },
+        "accessible": { "type": "boolean" }
+      }
+    }
+  }
+}

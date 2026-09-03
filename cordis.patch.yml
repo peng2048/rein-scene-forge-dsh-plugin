@@ -1,4 +1,4 @@
 - insert:
     - id: rein-scene-forge-skill
       name: rein-scene-forge-dsh-plugin
-      inject: [skills]
+      inject: [skills, tools]

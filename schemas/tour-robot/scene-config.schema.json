@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tour_robot scene_config.yaml",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "scene_id", "scene_name", "programs"],
+  "properties": {
+    "version": { "type": ["string", "number"] },
+    "scene_id": { "$ref": "#/$defs/id" },
+    "scene_name": { "type": "string", "minLength": 1 },
+    "prompt_context": { "type": "object" },
+    "default_language": { "type": "string", "minLength": 1 },
+    "basic_templates": { "type": "object" },
+    "dynamic_tour": { "type": "object" },
+    "programs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/program" }
+    },
+    "special_configs": { "type": "object" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "program": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["name", "explain_point_keys"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "duration_mode": { "type": "string", "minLength": 1 },
+        "explain_point_keys": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "point_sequence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "photo_enabled": { "type": "boolean" },
+        "photo_before_explain": { "type": "boolean" },
+        "photo_after_explain": { "type": "boolean" },
+        "photo_after_explain_use_profile": { "type": "boolean" },
+        "photo_point": { "$ref": "#/$defs/id" }
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tour_robot explain_config.yaml",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "scene_id", "max_explain_points", "max_segments_per_point", "areas"],
+  "properties": {
+    "version": { "type": ["string", "number"] },
+    "scene_id": { "$ref": "#/$defs/id" },
+    "max_explain_points": { "type": "integer", "minimum": 1 },
+    "max_segments_per_point": { "type": "integer", "minimum": 1, "maximum": 16 },
+    "planning_rules": { "type": "object" },
+    "areas": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/area" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "pointId": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "integer" }] },
+    "area": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "name", "description", "narrator", "points"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "narrator": { "type": "string", "minLength": 1 },
+        "points": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/explainPoint" }
+        }
+      }
+    },
+    "explainPoint": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "name", "map_point", "point_id", "narrator", "estimated_duration", "priority", "after_point_explain", "segments"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "map_point": { "$ref": "#/$defs/id" },
+        "point_id": { "$ref": "#/$defs/pointId" },
+        "dbg_point_id": { "$ref": "#/$defs/pointId" },
+        "narrator": { "type": "string", "minLength": 1 },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "estimated_duration": { "type": "number", "minimum": 0 },
+        "priority": { "type": "integer", "minimum": 0 },
+        "after_point_explain": { "enum": ["direct", "ask_questions", "dwell_continue"] },
+        "segments": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/segment" }
+        },
+        "approach": { "type": "object" },
+        "passing": { "type": "object" }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "name", "content", "estimated_duration", "is_mandatory"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 },
+        "gesture": { "type": "string", "minLength": 1 },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "estimated_duration": { "type": "number", "minimum": 0 },
+        "is_mandatory": { "type": "boolean" },
+        "conditions": { "type": "object" },
+        "dynamic_only": { "type": "boolean" },
+        "variants": { "type": "array", "minItems": 1 },
+        "pause_after_seconds": { "type": "number", "minimum": 0, "maximum": 300 }
+      }
+    }
+  }
+}

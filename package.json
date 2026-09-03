@@ -1,7 +1,7 @@
 {
   "name": "rein-scene-forge-dsh-plugin",
-  "version": "0.1.0",
-  "description": "Prebuilt DeepSeek Harness tools and Skill for deterministic Rein Scene Forge validation and tour_robot package compilation.",
+  "version": "0.2.0",
+  "description": "DeepSeek Harness Skill and deterministic validators for generating tour_robot YAML from points.json and narration material.",
   "type": "module",
   "main": "./lib/index.js",
   "exports": {
@@ -12,9 +12,8 @@
   "files": [
     "lib/**/*.js",
     "skills/**/*.md",
-    "schemas/**/*.json",
-    "schemas/**/*.md",
-    "examples/**/*.json",
+    "skills/**/*.yaml",
+    "schemas/tour-robot/*.schema.json",
     "cordis.patch.yml",
     "README.md",
     "README.zh.md",
