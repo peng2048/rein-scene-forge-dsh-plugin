@@ -7,6 +7,35 @@ role: "<confirmed_robot_role>"
 language_style: "<confirmed_language_style>"
 default_language: "zh"
 
+dynamic_tour:
+  enabled: true
+  compiler_required: true
+  startup_source: "pad_compiler"
+  default_program: "full"
+  default_duration_mode: "full"
+  default_group_type: "adult"
+  default_perspective: "balanced"
+  default_joke_level: 0
+  default_interaction_enabled: false
+  supported_group_types:
+    - "government"
+    - "industry"
+    - "experts"
+    - "university"
+    - "middle_school"
+    - "primary_school"
+    - "family_with_child"
+    - "adult"
+    - "senior"
+  supported_perspectives:
+    - "balanced"
+  supported_duration_modes:
+    - "full"
+    - "express"
+  session_overrides:
+    photo_enabled: false
+    allow_photo_enable: false
+
 basic_templates:
   welcome_prefix: "<confirmed_or_source_based_welcome>"
   farewell_suffix: "<confirmed_or_source_based_farewell>"
@@ -33,5 +62,4 @@ programs:
 # obstacle_speech: ...
 # standby_vision_responses: ...
 # special_configs: ...
-# dynamic_tour: ...
 # Additional programs such as express: ...

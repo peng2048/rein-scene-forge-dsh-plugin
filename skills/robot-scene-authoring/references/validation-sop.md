@@ -22,7 +22,7 @@ Failure at this gate blocks YAML writing.
 ## Gate 3: Target Files
 
 1. Write `map_config.yaml`, `scene_config.yaml`, and `explain_config.yaml` into `<scene_id>/`.
-2. Write `reception_pack.yaml` only for confirmed dynamic reception.
+2. Write `reception_pack.yaml` and enable `scene_config.dynamic_tour` by default. Never interpret missing user instructions as a request to disable dynamic PAD reception.
 3. Invoke `validate_tour_robot_scene` with the final directory and original `points.json`.
 4. Require valid YAML with unique keys, valid target schemas, one shared `scene_id`, and an exact directory-name match.
 

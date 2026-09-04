@@ -12,7 +12,7 @@ The plugin includes a versioned machine-readable Rule Set under `rules/` and exp
 - `validate_authoring_model`
 - `validate_tour_robot_scene`
 
-Default output is one `<scene_id>/` directory containing `map_config.yaml`, `scene_config.yaml`, and `explain_config.yaml`; `reception_pack.yaml` is optional for confirmed dynamic reception.
+Default output is one `<scene_id>/` directory containing `map_config.yaml`, `scene_config.yaml`, `explain_config.yaml`, and `reception_pack.yaml`. New scenes enable dynamic PAD reception by default; missing user instructions must not silently disable it.
 
 Development checks:
 

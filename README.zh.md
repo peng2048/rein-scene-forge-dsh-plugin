@@ -17,7 +17,7 @@
 ├── map_config.yaml
 ├── scene_config.yaml
 ├── explain_config.yaml
-└── reception_pack.yaml  # 仅启用动态接待时
+└── reception_pack.yaml  # 新场景默认启用动态 PAD 接待并生成
 ```
 
 插件不默认生成 Scene IR、Requirement JSON、manifest、traceability、summary 或 import guide。

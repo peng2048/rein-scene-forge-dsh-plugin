@@ -19,7 +19,7 @@ Multiple logical map or Explain Points may share one physical navigation ID. Nev
 ├── map_config.yaml
 ├── scene_config.yaml
 ├── explain_config.yaml
-└── reception_pack.yaml  # optional
+└── reception_pack.yaml  # required for new dynamic PAD authoring
 ```
 
 Use lowercase snake_case for `scene_id`. All YAML files must use the same `scene_id`.
@@ -95,7 +95,7 @@ Rules:
 - Do not emit `point_sequence`; the current Python runtime does not use it.
 - Every listed Explain Point must exist.
 - Set `photo_point` explicitly to a confirmed map point because the real loader warns when it is absent. When no photo workflow is requested, keep `photo_enabled`, `photo_before_explain`, `photo_after_explain`, and `photo_after_explain_use_profile` false. Do not infer a photo location.
-- Add `dynamic_tour` only when dynamic reception compilation is actually used.
+- Enable `dynamic_tour` by default for new output and pair it with `reception_pack.yaml`; do not silently fall back to static output.
 - Add `special_configs`, standby vision, gestures, work hours, battery speech, and similar features only when explicitly supported and confirmed.
 
 ## explain_config.yaml

@@ -36,13 +36,28 @@ async function writeScene({ farewellPointId = "4", includeFarewell = true } = {}
   };
   if (includeFarewell) mapPoints.farewell1 = { name: "送别", point_id: "4", type: "base", accessible: true };
   await writeFile("demo/map_config.yaml", stringify({ version: "1.0", scene_id: "demo", points: mapPoints }));
-  await writeFile("demo/scene_config.yaml", stringify({ version: "1.0", scene_id: "demo", scene_name: "演示场景", programs: { full: { name: "完整导览", explain_point_keys: ["welcome_start", "farewell_end"] } } }));
+  await writeFile("demo/scene_config.yaml", stringify({
+    version: "1.0", scene_id: "demo", scene_name: "演示场景",
+    dynamic_tour: {
+      enabled: true, compiler_required: true, startup_source: "pad_compiler",
+      supported_group_types: ["government", "industry", "experts", "university", "middle_school", "primary_school", "family_with_child", "adult", "senior"],
+      supported_duration_modes: ["full", "express"]
+    },
+    programs: { full: { name: "完整导览", explain_point_keys: ["welcome_start", "farewell_end"] } }
+  }));
   await writeFile("demo/explain_config.yaml", stringify({
     version: "2.0", scene_id: "demo", max_explain_points: 2, max_segments_per_point: 16,
     areas: { main: { id: "main", name: "主区", description: "", narrator: "robot", points: {
       welcome_start: { id: "welcome_start", name: "迎宾", map_point: "welcome1", point_id: "3", narrator: "robot", estimated_duration: 10, priority: 1, after_point_explain: "direct", segments: { opening: { id: "opening", name: "欢迎", content: "欢迎参观。", estimated_duration: 10, is_mandatory: true } } },
       farewell_end: { id: "farewell_end", name: "送别", map_point: "farewell1", point_id: farewellPointId, narrator: "robot", estimated_duration: 10, priority: 2, after_point_explain: "direct", segments: { ending: { id: "ending", name: "送别", content: "感谢参观。", estimated_duration: 10, is_mandatory: true } } }
     } } }
+  }));
+  await writeFile("demo/reception_pack.yaml", stringify({
+    scene_id: "demo",
+    personas: ["government", "industry", "experts", "university", "middle_school", "primary_school", "family_with_child", "adult", "senior"].map((id) => ({
+      id, label: id,
+      defaults: { priority: "medium", joke_level: 0, photo_enabled: false, interaction_enabled: false, duration_mode: "full", pacing: "station", perspective: "balanced" }
+    }))
   }));
 }
 
@@ -84,6 +99,16 @@ test("reports loader warnings and unreachable explain points", async () => {
   });
 });
 
+test("requires the default dynamic reception pack", async () => {
+  await workspace(async () => {
+    await writeScene();
+    await rm("demo/reception_pack.yaml");
+    const result = await validateTourRobotScene({ scene_directory: "demo", points_path: "points.json" });
+    assert.equal(result.is_valid, false);
+    assert.ok(result.diagnostics.some((item) => item.code === "RSF_TARGET_FILE_MISSING" && item.object_path === "reception_pack.yaml"));
+  });
+});
+
 test("reports misplaced welcome and farewell execution points", async () => {
   await workspace(async () => {
     await writeScene();
@@ -120,7 +145,7 @@ test("rejects a scene directory that does not match scene_id", async () => {
   await workspace(async () => {
     await writeScene();
     await mkdir("wrong-name");
-    for (const file of ["map_config.yaml", "scene_config.yaml", "explain_config.yaml"]) {
+    for (const file of ["map_config.yaml", "scene_config.yaml", "explain_config.yaml", "reception_pack.yaml"]) {
       await writeFile(`wrong-name/${file}`, await readFile(`demo/${file}`));
     }
     const result = await validateTourRobotScene({ scene_directory: "wrong-name", points_path: "points.json" });

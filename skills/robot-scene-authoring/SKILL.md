@@ -17,14 +17,14 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 6. Treat `id` as the physical navigation ID. Treat the YAML map key and Explain Point key as separate logical identities.
 7. Review exact and near-pose groups with the user. Equal `x`, `y`, and `yaw` does not mean duplicate. For example, welcome and farewell may share one pose but remain different logical points.
 8. Match narration sections to point candidates by meaning and route context. If names and narration do not reliably match, stop and ask the user; do not guess.
-9. Confirm at least: scene identity, point-to-content mapping, route order, welcome/standby/farewell/photo roles, inaccessible or unused points, narration preservation/optimization policy, and optional reception behavior.
+9. Confirm at least: scene identity, point-to-content mapping, route order, welcome/standby/farewell/photo roles, inaccessible or unused points, and narration preservation/optimization policy. Dynamic PAD reception is enabled by default; ask only when the user requests a static or non-PAD scene, and do not silently disable it.
 10. Read `references/model-catalog.md` before selecting any field, then read `references/tour-robot-data-model.md` and fill the bundled templates. The catalog is authoritative: never invent a target field.
 11. Create exactly one output directory named by the confirmed `scene_id`.
 12. Write only:
     - `map_config.yaml`
     - `scene_config.yaml`
     - `explain_config.yaml`
-    - `reception_pack.yaml` only when dynamic reception/personas are explicitly requested and confirmed
+    - `reception_pack.yaml`
 13. Build the internal authoring envelope and invoke `validate_authoring_model`; fix all model errors before writing YAML.
 14. Read and execute every gate in `references/validation-sop.md` after generation.
 15. Invoke `validate_tour_robot_scene` with the scene directory and original `points.json` until it returns `is_publishable: true`.
@@ -52,6 +52,7 @@ Use the installed plugin to turn an authoritative `points.json` and narration do
 
 ## Fine-Grained Dynamic Narration
 
+- Enable `dynamic_tour` and generate `reception_pack.yaml` by default. Absence of an explicit user request is not permission to disable dynamic PAD reception.
 - Generate a dynamic authoring configuration for the fixed nine Personas; do not create separate static YAML files per audience or tone.
 - Keep one short base Segment for each atomic fact, exhibit state, transition, question, or action. Split at natural sentence or fact boundaries; target 6-40 Chinese characters and never exceed 40 characters per spoken `content` or Variant `content`.
 - Do not truncate, compress away qualifiers, or break a proper noun merely to meet the limit. Continue the same fact in the next ordered Segment when one accurate sentence cannot fit.

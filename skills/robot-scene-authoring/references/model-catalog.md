@@ -4,7 +4,7 @@ This catalog is the field-selection authority for the plugin. Target fields come
 
 ## Authoring Model
 
-The internal model is a workspace envelope. Its `map_config`, `scene_config`, `explain_config`, and optional `reception_pack` values are the exact objects written to the same-named YAML files; there is no field translation.
+The internal model is a workspace envelope. Its `map_config`, `scene_config`, `explain_config`, and `reception_pack` values are the exact objects written to the same-named YAML files; there is no field translation.
 
 | Field | Required | Meaning |
 |---|---:|---|
@@ -63,7 +63,7 @@ Persona fields: `id`, `label`, `group`, `audience_title`, `focus`, `defaults`. D
 
 ## Required Versus Recommended
 
-The authoring model is dynamic: `reception_pack.personas` contains exactly nine fixed IDs (`government`, `industry`, `experts`, `university`, `middle_school`, `primary_school`, `family_with_child`, `adult`, `senior`). Expression intensity is the existing runtime `joke_level` with values `0` formal, `1` relaxed, and `2` humorous. Audience and intensity variation is represented by target fields `conditions` and `variants`, not by separate YAML files.
+New authoring output is dynamic by default: `reception_pack.personas` contains exactly nine fixed IDs (`government`, `industry`, `experts`, `university`, `middle_school`, `primary_school`, `family_with_child`, `adult`, `senior`). Expression intensity is the existing runtime `joke_level` with values `0` formal, `1` relaxed, and `2` humorous. Audience and intensity variation is represented by target fields `conditions` and `variants`, not by separate YAML files. Missing user instructions never imply static output.
 
 Schema-required means the real runtime cannot safely consume the object without the field. The Skill may require additional fields for newly generated scenes to avoid legacy fallbacks. In particular, new Explain Points always set `after_point_explain`; new Segments always set `is_mandatory`; new Programs always set `name` and `explain_point_keys`.
 

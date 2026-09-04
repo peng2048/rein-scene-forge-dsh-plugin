@@ -1,13 +1,12 @@
-# Optional: generate only for explicitly confirmed dynamic reception.
+# Required by default for new dynamic PAD authoring.
 scene_id: "<confirmed_scene_id>"
 scene_name: "<confirmed_scene_name>"
 languages:
   - "zh"
 personas:
-  - id: "<confirmed_persona_id>"
-    label: "<confirmed_persona_label>"
-    audience_title: "<confirmed_audience_title>"
-    defaults:
+  - id: "government"
+    label: "政府来访"
+    defaults: &persona_defaults
       priority: "medium"
       joke_level: 0
       photo_enabled: false
@@ -15,6 +14,31 @@ personas:
       duration_mode: "full"
       pacing: "station"
       perspective: "balanced"
+  - id: "industry"
+    label: "行业客户"
+    defaults: *persona_defaults
+  - id: "experts"
+    label: "专家"
+    defaults: *persona_defaults
+  - id: "university"
+    label: "高校"
+    defaults: *persona_defaults
+  - id: "middle_school"
+    label: "中学生"
+    defaults: *persona_defaults
+  - id: "primary_school"
+    label: "小学生"
+    defaults: *persona_defaults
+  - id: "family_with_child"
+    label: "亲子家庭"
+    defaults: *persona_defaults
+  - id: "adult"
+    label: "普通成人"
+    defaults: *persona_defaults
+  - id: "senior"
+    label: "老年群体"
+    defaults: *persona_defaults
+# Keep all nine IDs. Adjust each defaults object only from confirmed venue policy.
 # Optional supported mappings:
 # region_greetings: {...}
 # condition_aliases: {...}
